@@ -1,5 +1,4 @@
-# edxDashboard
-Responsive Student Dashboard
+## Dashboard Competition
 
 http://databits.io/challenges/edx-learning-dashboard-challenge
 
