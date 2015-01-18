@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>Course Progress</title>
+
+	<link rel="stylesheet" type="text/css" href="../bower_components/semantic-ui/dist/semantic.min.css"></link>
+	<link rel="stylesheet" type="text/css" href="./css/dashboard.css"></link>
+	
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.js"></script>
+	<script src="../bower_components/semantic-ui/dist/semantic.min.js"></script>
+</head>
+
+<body>
+	<div class="ui floating labeled icon dropdown button search">
+		<i class="users icon"></i>
+		<span class="text">Select Student</span>
+		<div class="menu"></div>
+	</div>
+
+	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+	<script>
+
+	var currentStudent = null;
+
+	var format = d3.time.format("%Y-%m-%d");
+	
+	var minutesPerDay;
+
+	d3.csv("minutes_per_day.csv", function(d) {
+			
+			return {
+						student_id: +d.student_id,
+						date: format.parse(d.date),
+						minutes_on_site: +d.minutes_on_site
+			};
+
+		}, function(error, rows) {
+				
+			var minutesPerDay = rows;
+			var students = [];
+			
+			minutesPerDay.forEach(function(std) {
+				students.push(std.student_id);
+			});
+			
+			students = d3.set(students).values();
+			students.forEach(function(d) {
+				return +d;
+			})
+
+			var menu = d3.select("div.menu");
+
+			menu.on("change", function(d) {
+		        currentStudent = d3.select(this).property("value");
+		        alert(currentStudent);
+		      });
+
+		    menu.selectAll("div.item")
+				.data(students)
+				.enter()
+				.append("div")
+				.attr("class", "item")
+				.html(function(d) { 
+					return '<i class="user icon"></i>Student ' + d;
+				});
+	});
+
+	var margin = {top: 20, right: 10, bottom: 20, left: 10};
+	var width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+	var svg = d3.select("body").append("svg")
+		.attr("width", width + margin.left + margin.right)
+		.attr("height", height + margin.top + margin.bottom)
+	    .append("g")
+	    .attr("transform","translate(" + margin.left + "," + margin.top + ")");
+	</script>
+	<script src="./js/dashboard.js"></script>
+</body>
+</html>
