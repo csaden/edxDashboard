@@ -15,7 +15,7 @@
 <body>
 <div class="ui grid">
 	<div class="computer tablet only row">
-		<div id="#nav" class="ui menu navbar">
+		<div id="nav" class="ui menu navbar">
 			<a class="brand item edx-home-image">
 				<img href="https://edx.org" title="Home Page" src="https://d37djvu3ytnwxt.cloudfront.net/static/images/edx-theme/edx-logo-77x36.png" alt="edX">
 			</a>
@@ -48,11 +48,12 @@
 		</div>
 	</div>
 </div>
+
 <div class="ui doubling grid">
 	<div class=".row">
 		<div class="ui three column doubling grid">
 
-			<div class="three wide column column-addon left floated">
+			<div class="two wide column column-addon left floated">
 				<div id="student-dropdown">	
 					<div class="ui search selection dropdown">
 						<input type="hidden" name="currentStudent"></input>
@@ -65,60 +66,64 @@
 
 			<div class="ten wide column column-addon left floated">
 				<table class="summary-stats">
-					<tr>
-						<th class="stat-names"></th>
-						<th class="stat-num"></th>
-						<th class="stat-bar"></th>
-						<th class="stat-percentile"></th>
-					</tr>
-					<tr>
-						<td class="look stat-title">Summary</td>
-						<td></td>
-						<td></td>
-						<td class="stat-percentile">Percentile</td>
-					</tr>
-					<tr>
-						<td class="stat-title">Current Grade</td>
-						<td class="stat-data">A</td>
-						<td id="grade">
-							<div class="ui progress">
-									<div class="bar">
-										<div class="progress"></div>
+					<thead>
+						<tr>
+							<th class="stat-names"></th>
+							<th class="stat-num"></th>
+							<th class="stat-bar"></th>
+							<th class="stat-percentile"></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td class="look stat-title">Summary</td>
+							<td></td>
+							<td></td>
+							<td class="stat-percentile">Percentile</td>
+						</tr>
+						<tr>
+							<td class="stat-title">Current Grade</td>
+							<td class="stat-data">A</td>
+							<td id="grade">
+								<div class="ui progress">
+										<div class="bar">
+											<div class="progress"></div>
+										</div>
 									</div>
-								</div>
+								</td>
+							<td class="percentile">96%</td>
+						</tr>
+						<tr>
+							<td class="stat-title">Total Points Earned</td>
+							<td class="stat-data">198 / 200</td>
+							<td id="total-points">
+								<div class="ui progress">
+										<div class="bar">
+											<div class="progress"></div>
+										</div>
+									</div>
 							</td>
-						<td class="percentile">96%</td>
-					</tr>
-					<tr>
-						<td class="stat-title">Total Points Earned</td>
-						<td class="stat-data">198 / 200</td>
-						<td id="total-points">
-							<div class="ui progress">
-									<div class="bar">
-										<div class="progress"></div>
+							<td class="percentile">99%</td>
+						</tr>
+						<tr>
+							<td class="stat-title">Total Time Watching Videos</td>
+							<td class="stat-data">2:34</td>
+							<td id="total-video-time">
+								<div class="ui progress">
+										<div class="bar">
+											<div class="progress"></div>
+										</div>
 									</div>
-								</div>
-						</td>
-						<td class="percentile">99%</td>
-					</tr>
-					<tr>
-						<td class="stat-title">Total Time Watching Videos</td>
-						<td class="stat-data">2:34</td>
-						<td id="total-video-time">
-							<div class="ui progress">
-									<div class="bar">
-										<div class="progress"></div>
-									</div>
-								</div>
-						</td>
-						<td class="percentile">3%</td>
-					</tr>
-					<tr>
-						<td class="stat-title">Average Time in Class Each Day</td>
-						<td class="stat-data">22 min</td>
-						<td></td>
-						<td></td>
-					</tr>
+							</td>
+							<td class="percentile">3%</td>
+						</tr>
+						<tr>
+							<td class="stat-title">Average Time in Class Each Day</td>
+							<td class="stat-data">22 min</td>
+							<td></td>
+							<td></td>
+						</tr>
+					</tbody>
 <!-- Might add this information in later-->
 <!--					<tr>
 						<td class="stat">Last Video Watched</td>
@@ -135,7 +140,7 @@
 				</table>
 			</div>
 
-			<div class="three wide column column-addon left floated">
+			<div class="four wide column column-addon left floated">
 				<div id="call-to-action">
 					<div class="look">What Should I do next?</div>
 					<div>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.</div>
@@ -144,6 +149,7 @@
 		</div>
 	</div>
 </div>
+
 <div class="ui doubling grid">
 	<div class="computer tablet only row">
 		<div class="ui divider"></div>
@@ -160,14 +166,23 @@
 		</div>
 	</div>
 </div>
+
 <div class="ui doubling grid">
-	<div class="ui two column doubling grid">
-		<div class="ten wide column column-addon left floated">
-			<div id="problem-details" class="look">Problem Set Scores</div>
-		</div>
-		<div class="six wide column column-addon left floated">
-			<div id="video-details" class="look">Video Progress in Lectures</div>
-		</div>
+	<div class="ui one column doubling grid">
+		<table class="progress-details" class="look">
+			<thead>
+				<tr>
+					<th class="detail-week look">Progress Details</th>
+					<th class="detail-lecture"></th>
+					<th class="detail-score">Total Score</th>
+					<th class="detail-problem-bar"></th>
+					<th class="detail-problems">Problem Scores</th>
+					<th class="detail-video-time">Total Video Watched</th>
+					<th class="detail-video-bar"></th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
 	</div>
 </div>
 

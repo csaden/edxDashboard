@@ -18,24 +18,48 @@ img[title="Home Page"] {
 .percentile:hover {
 	font-weight: bold;
 	font-size: large;
-	color: #00A0E3;
+	color: #71C3E8;
 }
 
 .ui.progress .bar {
 	width: 95%;
-	background: #E883B6;
+	background: #71C3E8;
 }
 
-.summary-stats {
+.tbody
+
+.summary-stats, .progress-details {
 	table-layout: fixed;
 	width: 100%;
 	white-space: nowrap;
 }
 
-.summary-stats td {
+.summary-stats td, .progress-details td {
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+}
+
+.look {
+	font-weight: bold;
+	font-size: 1.3em;
+}
+
+.progress-details {
+	margin: 0 2%;
+}
+
+.progress-details th {
+	padding-bottom: 0;
+}
+
+.progress-details td {
+	padding: 1em .5em 1em .5em;
+	text-align: left;
+}
+
+.progress-details th {
+	text-align: left;
 }
 
 .stat-name {
@@ -62,86 +86,72 @@ img[title="Home Page"] {
 	margin-left: .25%;
 }
 
+.stat-title, .stat-data {
+	padding: 1%;
+	font-size: 1.1em;
+}
+
 .stat-title {
 	text-align: right;
-	padding: 1%;
-	font-size: 1em;
 }
 
 .stat-data {
 	text-align: center;
-	padding: 1%;
-	font-size: 1em;
 }
 
-.look {
-	font-weight: bold;
-	font-size: 1.3em;
-}
-
-.week, .lecture, .lecture-total, .problem-set {
-	display: inline-block;
-	padding: 1% 1% 0 0;
-}
-
-.problem-id {
-	display: inline;
-	padding: 2% 4% 0 0;
-}
-
-.week-row, .video-row {
+.week-row {
 	width: 100%;
-	padding: 1% 0;
-	font-size: 1em;
+	font-size: 1.1em;
 	font-weight: normal;
 }
 
-.week-row:nth-child(2n), .video-row:nth-child(2n) {
-	background: #FAFAFA;
+.week-row:nth-child(2n) {
+	width: 100%;
+	background: white;
 }
 
-.week-row:nth-child(2n+1), .video-row:nth-child(2n+1) {
-	background: White;
+.week-row:nth-child(2n+1) {
+	width: 100%;
+	background: #F2F2F2;
 }
 
-.week {
-	min-width: 10%;
+.detail-week {
+	width: 10%;
 }
 
-.lecture {
-	min-width: 10%;
+.detail-lecture {
+	width: 10%;
 }
 
-.lecture-total {
-	min-width: 10%;
+.detail-score {
+	width: 10%;
 	text-align: center;
 }
 
+.detail-problem-bar {
+	width: 15%;
+}
+
+.detail-problems {
+	width: 30%;
+}
+
+.detail-video-time {
+	width: 10%;
+}
+
+.detail-video-bar {
+	width: 15%;
+}
+
 .problem-set {
-	min-width: 60%;
+	display: inline-block;
 }
 
 .problem-id {
 	font-size: .9em;
 	color: #8A8C8F;
 	font-weight: lighter;
-}
-
-.video-lecture, .video-total-time, .video-progress {
-	display: inline;
-	padding: 1% 1% 0 0;
-}
-
-.video-lecture {
-	min-width: 15%;
-}
-
-.max-total-time {
-	min-width: 15%;
-}
-
-.video-progress {
-	min-width: 70%;
 }
 
 .ui.tiny.progress .bar {

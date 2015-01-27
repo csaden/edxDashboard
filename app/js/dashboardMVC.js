@@ -17,6 +17,7 @@ $(function() {
 			modelThis.problemAttempts = null;
 			modelThis.videos = null;
 			modelThis.videoViews = null;
+			modelThis.details = null;
 
 			//computer totals
 			modelThis.totalPoints = null;
@@ -26,6 +27,17 @@ $(function() {
 			modelThis.videoProgress = null;
 
 			$( document ).ready(function() {
+
+				$(".right.menu.open").on("click", function(e) {
+					e.preventDefault();
+					$(".ui.vertical.menu").toggle();
+				});
+
+				$("#nav a.item").on("click", function() {
+					$(this).addClass("active")
+						.siblings()
+						.removeClass("active");
+				});
 
 				modelThis.createDropDown();
 
@@ -62,8 +74,7 @@ $(function() {
 							};
 						}).entries(modelThis.videoViews);
 
-					modelThis.createProblemTable();
-					modelThis.createVideoTable();
+					modelThis.createDetailsTable();
 
 				});
 
@@ -106,18 +117,19 @@ $(function() {
 			});
 		},
 
-		createProblemTable : function() {
+		createDetailsTable : function() {
 
-			modelThis.problems = d3.nest()
+			//parse general problems data
+			modelThis.details = d3.nest()
 				.key(function(d) { return d.section; })
 				.key(function(d) { return d.subsection; })
 				.map(modelThis.problems);
 
-			var allProblems = [];
+			var _allProblems = [];
 
-			for (var weekKey in modelThis.problems) {
+			for (var weekKey in modelThis.details) {
 				
-				var lectures = modelThis.problems[weekKey];
+				var lectures = modelThis.details[weekKey];
 
 				for (var lectureKey in lectures) {
 
@@ -127,100 +139,124 @@ $(function() {
 					newObject["lecture"] = lectureKey;
 					newObject["problems"] = lectures[lectureKey];
 					newObject["max_total_points"] = d3.sum(lectures[lectureKey], function(d) { return d.max_points; });
-					allProblems.push(newObject);
+					_allProblems.push(newObject);
 				}
 			}
 
-			modelThis.problems = allProblems;
+			modelThis.details = _allProblems;
 
-			var weekRow = d3.select("#problem-details")
-				.selectAll("div.week-row")
-				.data(modelThis.problems)
+			//parse general videos data
+			modelThis.videos = d3.nest()
+				.key(function(d) { return d.section; })
+				.key(function(d) { return d.subsection; })
+				.map(modelThis.videos);
+
+			var _allVideos = [];
+
+			for (var vidWeekKey in modelThis.videos) {
+				
+				var vidLectures = modelThis.videos[vidWeekKey];
+
+				for (var vidLectureKey in vidLectures) {
+
+					newObject = {};
+
+					newObject["week"] = vidWeekKey;
+					newObject["lecture"] = vidLectureKey;
+					newObject["videos"] = vidLectures[vidLectureKey];
+					newObject["max_total_time"] = d3.sum(vidLectures[vidLectureKey], function(d) {
+						return d.duration_seconds;
+					});
+					_allVideos.push(newObject);
+				}
+			}
+
+			modelThis.videos = _allVideos;
+
+			console.log(modelThis.details);
+			console.log(modelThis.videos);
+
+			for (var i in modelThis.details) {
+
+				var thisWeek = modelThis.details[i].week;
+				var thisLecture = modelThis.details[i].lecture;
+
+				if (thisWeek === modelThis.videos[i].week && thisLecture === modelThis.videos[i].lecture) {
+
+					modelThis.details[i]["videos"] = modelThis.videos[i].videos;
+					modelThis.details[i]["max_total_time"] = modelThis.videos[i].max_total_time;
+				}
+
+			}
+
+			console.log(modelThis.details);
+
+			var weekRow = d3.select(".progress-details tbody")
+				.selectAll("tr.week-row")
+				.data(modelThis.details)
 				.enter()
-				.append("div")
+				.append("tr")
 				.attr("class", "week-row");
 
-			weekRow.append("div")
+			weekRow.append("td")
 				.attr("class", "week")
 				.text(function(d) { return d.week; });
 
-			weekRow.append("div")
+			weekRow.append("td")
 				.attr("class", "lecture")
 				.text(function(d) { return d.lecture; });
 
-			weekRow.append("div")
-				.attr("class", "lecture-total")
+			weekRow.append("td")
+				.attr("class", "problem-total")
 				.text(function(d) { return d.max_total_points; });
+
+			weekRow.append("td")
+				.attr("class", "problem-bar")
+				.text("Problem Bar");
 
 			weekRow.each(function(d) {
 
-				var current = d3.select(this).append("div")
+				var current = d3.select(this).append("tr")
 					.attr("class", "problem-set");
 
 				for (var i=0; i <= d.problems.length - 1; i++) {
 
-					current.append("div")
+					current.append("td")
 						.attr("class", "problem-id")
 						.attr("id", d.problems[i].id)
 						.text("0" + "/" + d.problems[i].max_points);
 				}
 
 			});
-		},
 
-		createVideoTable : function() {
-
-			modelThis.videos = d3.nest()
-				.key(function(d) { return d.section; })
-				.key(function(d) { return d.subsection; })
-				.map(modelThis.videos);
-
-			var allVideos = [];
-
-			for (var weekKey in modelThis.videos) {
-				
-				var lectures = modelThis.videos[weekKey];
-
-				for (var lectureKey in lectures) {
-
-					newObject = {};
-
-					newObject["week"] = weekKey;
-					newObject["lecture"] = lectureKey;
-					newObject["videos"] = lectures[lectureKey];
-					newObject["max_total_time"] = d3.sum(lectures[lectureKey], function(d) {
-						return d.duration_seconds;
-					});
-					allVideos.push(newObject);
-				}
-			}
-
-			modelThis.videos = allVideos;
-
-			console.log(modelThis.videos);
-
-			var weekRow = d3.select("#video-details")
-				.selectAll("div.video-row")
-				.data(modelThis.videos)
-				.enter()
-				.append("div")
-				.attr("class", "video-row");
-
-			weekRow.append("div")
-				.attr("class", "video-lecture")
-				.text(function(d) { return d.lecture; });
-
-			weekRow.append("div")
-				.attr("class", "video-total-time")
+			weekRow.append("td")
+				.attr("class", "video-total")
 				.text(function(d) { return d.max_total_time; });
 
-			weekRow.append("div")
-				.attr("class", "ui tiny progress video-progress")
-				.append("div")
-				.attr("class", "bar")
-				.append("div")
-				.attr("progress");
+			weekRow.append("td")
+				.attr("class", "video-bar")
+				.text("Video Bar");
 		}
+
+		// 	var weekRow = d3.select("#video-details")
+		// 		.selectAll("div.video-row")
+		// 		.data(modelThis.videos)
+		// 		.enter()
+		// 		.append("div")
+		// 		.attr("class", "video-row");
+
+		// 	weekRow.append("div")
+		// 		.attr("class", "video-lecture")
+		// 		.text(function(d) { return d.lecture; });
+
+		// 	weekRow.append("div")
+		// 		.attr("class", "video-total-time")
+		// 		.text(function(d) { return d.max_total_time; });
+
+		// 	weekRow.append("div")
+		// 		.attr("class", "video-progress")
+		// 		.text("Video Progress Bar");
+		// }
 
 	};
 
@@ -231,8 +267,8 @@ $(function() {
 			view.init();
 		},
 
-		setCurrentStudent : function(student) {
-			model.currentStudent = student;
+		setCurrentStudent : function(studentId) {
+			model.currentStudent = studentId;
 		},
 
 		getCurrentStudent : function() {
@@ -243,9 +279,7 @@ $(function() {
 			return record.id;
 		},
 
-		updateSummary : function(student) {
 
-		},
 
 		updateDetailTable : function(student) {
 
