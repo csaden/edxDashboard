@@ -1,0 +1,38 @@
+# Course structure
+
+problems.csv
+id -- id for this problem
+section -- section of the course
+subsection -- subsection within that section
+max_points -- maximum points possible for this problem
+
+videos.csv
+id
+section
+subsection
+duration_seconds -- how long the video is, in seconds
+
+# Student activity
+
+problem_attempts.csv
+student_id
+section
+subsection
+problem_id
+date_attempted
+max_points -- same as the max_points column in problems.csv. Copied for convenience.
+score -- the student's score
+
+video_views.csv
+student_id
+section
+subsection
+video_id
+date_viewed
+duration_seconds -- same as duration_seconds from videos.csv. Copied for convenience.
+watched_seconds -- how many seconds of the video the student watched. Summary of all video activity--pauses, rewinds, skips, etc.
+
+Time on site: (minutes_per_day.csv)
+student_id
+date
+minutes_on_site

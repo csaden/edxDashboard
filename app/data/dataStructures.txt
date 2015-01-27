@@ -1,0 +1,26 @@
+*****************
+*				*
+*   students    *
+*				*
+*****************
+
+student id : id
+current grade : grade
+total points earned : pointsEarned
+total video time : totalTime
+last node visited : last node
+average time on site : avg time
+median time on site : median time
+problems : [ {problem_id :  score} ]
+videos : [ {video_id :  score} ]
+
+
+*****************
+*				*
+*  allStudents  *
+*				*
+*****************
+
+median of the medians of student site visit duration
+
+

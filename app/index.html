@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1">
+	<title>Course Progress</title>
+	
+	<link rel="stylesheet" type="text/css" href="bower_components/semantic-ui/dist/semantic.min.css"></link>
+	<link rel="stylesheet" type="text/css" href="css/dashboard.css"></link>
+
+	<script src="bower_components/jquery/dist/jquery.min.js"></script>
+	<script src="bower_components/semantic-ui/dist/semantic.min.js"></script>
+	<script src="js/helper.js"></script>
+	<script src="js/dashboardMVC.js"></script>
+</head>
+<body>
+<div class="ui grid">
+	<div class="computer tablet only row">
+		<div id="#nav" class="ui menu navbar">
+			<a class="brand item edx-home-image">
+				<img href="https://edx.org" title="Home Page" src="https://d37djvu3ytnwxt.cloudfront.net/static/images/edx-theme/edx-logo-77x36.png" alt="edX">
+			</a>
+			<a class="item">Courseware</a>
+			<a class="item">Updates & News</a>
+			<a class="item">Calendar</a>
+			<a class="item">Wiki</a>
+			<a class="item">Discussion</a>
+			<a class="item active">Progress</a>
+		</div>
+	</div>
+	<div class="mobile only narrow row">
+		<div class="ui menu navbar">
+			<a class="brand item">
+				<img href="https://edx.org" title="Home Page" src="https://d37djvu3ytnwxt.cloudfront.net/static/images/edx-theme/edx-logo-77x36.png" alt="edX">
+			</a>
+			<div class="right menu open">
+				<a href class="menu item">
+					<i class="content icon"></i>
+				</a>
+			</div>
+			<div class="ui vertical navbar menu" style="display: none;">
+				<a class="item">Courseware</a>
+				<a class="item">Updates & News</a>
+				<a class="item">Calendar</a>
+				<a class="item">Wiki</a>
+				<a class="item">Discussion</a>
+				<a class="item active">Progress</a>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="ui doubling grid">
+	<div class=".row">
+		<div class="ui three column doubling grid">
+
+			<div class="three wide column column-addon left floated">
+				<div id="student-dropdown">	
+					<div class="ui search selection dropdown">
+						<input type="hidden" name="currentStudent"></input>
+						<i class="dropdown icon"></i>
+						<div class="default text">Select a student...</div>
+						<div id="students" class="menu"></div>
+					</div>
+				</div>
+			</div>
+
+			<div class="ten wide column column-addon left floated">
+				<table class="summary-stats">
+					<tr>
+						<th class="stat-names"></th>
+						<th class="stat-num"></th>
+						<th class="stat-bar"></th>
+						<th class="stat-percentile"></th>
+					</tr>
+					<tr>
+						<td class="look stat-title">Summary</td>
+						<td></td>
+						<td></td>
+						<td class="stat-percentile">Percentile</td>
+					</tr>
+					<tr>
+						<td class="stat-title">Current Grade</td>
+						<td class="stat-data">A</td>
+						<td id="grade">
+							<div class="ui progress">
+									<div class="bar">
+										<div class="progress"></div>
+									</div>
+								</div>
+							</td>
+						<td class="percentile">96%</td>
+					</tr>
+					<tr>
+						<td class="stat-title">Total Points Earned</td>
+						<td class="stat-data">198 / 200</td>
+						<td id="total-points">
+							<div class="ui progress">
+									<div class="bar">
+										<div class="progress"></div>
+									</div>
+								</div>
+						</td>
+						<td class="percentile">99%</td>
+					</tr>
+					<tr>
+						<td class="stat-title">Total Time Watching Videos</td>
+						<td class="stat-data">2:34</td>
+						<td id="total-video-time">
+							<div class="ui progress">
+									<div class="bar">
+										<div class="progress"></div>
+									</div>
+								</div>
+						</td>
+						<td class="percentile">3%</td>
+					</tr>
+					<tr>
+						<td class="stat-title">Average Time in Class Each Day</td>
+						<td class="stat-data">22 min</td>
+						<td></td>
+						<td></td>
+					</tr>
+<!-- Might add this information in later-->
+<!--					<tr>
+						<td class="stat">Last Video Watched</td>
+						<td id="last-video"></td>
+						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						<td class="stat">Last Problem Attempted</td>
+						<td id="last-problem"></td>
+						<td></td>
+						<td></td>
+					</tr> -->
+				</table>
+			</div>
+
+			<div class="three wide column column-addon left floated">
+				<div id="call-to-action">
+					<div class="look">What Should I do next?</div>
+					<div>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="ui doubling grid">
+	<div class="computer tablet only row">
+		<div class="ui divider"></div>
+		<div>Course Map</div>
+	</div>
+</div>
+<div class="ui doubling grid">
+	<div class="ui two column doubling grid">
+		<div class="nine wide column column-addon left floated">
+			<div id="attendance" class="look">Minutes Per Day</div>
+		</div>
+		<div class="seven wide column column-addon left floated">
+			<div id="grade-distribution" class="look">Grade Distribution</div>
+		</div>
+	</div>
+</div>
+<div class="ui doubling grid">
+	<div class="ui two column doubling grid">
+		<div class="ten wide column column-addon left floated">
+			<div id="problem-details" class="look">Problem Set Scores</div>
+		</div>
+		<div class="six wide column column-addon left floated">
+			<div id="video-details" class="look">Video Progress in Lectures</div>
+		</div>
+	</div>
+</div>
+
+
+	<script src="bower_components/d3/d3.min.js" charset="utf-8"></script>
+	<script>
+	// add d3 code
+	</script>
+</body>
+</html>

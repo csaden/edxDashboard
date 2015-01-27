@@ -1,0 +1,149 @@
+body {
+	background: white;
+	font-family: "Source Sans Pro", Helvetica, sans-serif;
+}
+
+img[title="Home Page"] {
+	width: 64px;
+	height: 30px;
+}
+
+.stat-percentile, .percentile {
+	font-weight: lighter;
+	color: #8A8C8F;
+	font-size: 0.8em;
+	padding: 0 0 0 1%;
+}
+
+.percentile:hover {
+	font-weight: bold;
+	font-size: large;
+	color: #00A0E3;
+}
+
+.ui.progress .bar {
+	width: 95%;
+	background: #E883B6;
+}
+
+.summary-stats {
+	table-layout: fixed;
+	width: 100%;
+	white-space: nowrap;
+}
+
+.summary-stats td {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.stat-name {
+	width: 30%;
+}
+
+.stat-num {
+	width: 15%;
+}
+
+.stat-bar {
+	width: 40%;
+}
+
+.stat-percentile {
+	width: 15%;
+}
+
+.ui .progress:last-child {
+	margin: 1%;
+}
+
+.edx-home-image {
+	margin-left: .25%;
+}
+
+.stat-title {
+	text-align: right;
+	padding: 1%;
+	font-size: 1em;
+}
+
+.stat-data {
+	text-align: center;
+	padding: 1%;
+	font-size: 1em;
+}
+
+.look {
+	font-weight: bold;
+	font-size: 1.3em;
+}
+
+.week, .lecture, .lecture-total, .problem-set {
+	display: inline-block;
+	padding: 1% 1% 0 0;
+}
+
+.problem-id {
+	display: inline;
+	padding: 2% 4% 0 0;
+}
+
+.week-row, .video-row {
+	width: 100%;
+	padding: 1% 0;
+	font-size: 1em;
+	font-weight: normal;
+}
+
+.week-row:nth-child(2n), .video-row:nth-child(2n) {
+	background: #FAFAFA;
+}
+
+.week-row:nth-child(2n+1), .video-row:nth-child(2n+1) {
+	background: White;
+}
+
+.week {
+	min-width: 10%;
+}
+
+.lecture {
+	min-width: 10%;
+}
+
+.lecture-total {
+	min-width: 10%;
+	text-align: center;
+}
+
+.problem-set {
+	min-width: 60%;
+}
+
+.problem-id {
+	font-size: .9em;
+	color: #8A8C8F;
+	font-weight: lighter;
+}
+
+.video-lecture, .video-total-time, .video-progress {
+	display: inline;
+	padding: 1% 1% 0 0;
+}
+
+.video-lecture {
+	min-width: 15%;
+}
+
+.max-total-time {
+	min-width: 15%;
+}
+
+.video-progress {
+	min-width: 70%;
+}
+
+.ui.tiny.progress .bar {
+	background: #71C3E8;
+}

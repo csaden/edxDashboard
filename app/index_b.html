@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1">
+	<title>Course Progress</title>
+
+	<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/dashboard.css"></link>
+
+	<script src="bower_components/underscore/underscore-min.js"></script>
+	<script src="bower_components/jquery/dist/jquery.min.js"></script>
+	<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script src="js/helper.js"></script>
+	<script src="js/dashboard.js"></script>
+</head>
+
+<body>
+	<nav class="navbar navbar-default" role="navigation">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="index.html">
+       				<img title="Home Page" src="https://d37djvu3ytnwxt.cloudfront.net/static/images/edx-theme/edx-logo-77x36.png" alt="edX">
+      			</a>
+				<button type="button" class="navbar-toggle"
+						data-toggle="collapse"
+						data-target="#mainNavBar">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span> 
+				</button>
+      		</div>
+	      	<div class="collapse navbar-collapse" id="mainNavBar">
+				<ul class="nav navbar-nav navbar-left">
+					<li><a href="#">Courseware</a></li>
+					<li><a href="#">Updates & News</a></li>
+					<li><a href="#">Calendar</a></li>
+					<li><a href="#">Wiki</a></li>
+					<li><a href="#">Discussion</a></li>
+					<li class="active"><a href="#">Progress<span class="sr-only">(current)</span></a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+	
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-6">
+				<div class="btn-group">
+					<button type="button" class="btn btn-default">Select Student</button>
+					<button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle"><span class="caret"></span></button>
+					<ul class="student-dropdown students"></ul>
+				</div>
+			</div>
+			<div class="col-md-6">Summary Stats</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4">Call to Action</div>
+			<div class="col-md-8">Course Map</div>
+		</div>
+		<div class="row">
+			<div class="col-md-8">Problem and Video Table</div>
+			<div class="col-md-4">Daily Time on Site Bar Chart</div>
+		</div>
+	</div>
+
+	<script src="bower_components/d3/d3.min.js" charset="utf-8"></script>
+	<script>
+	// add d3 code
+	</script>
+</body>
+</html>
