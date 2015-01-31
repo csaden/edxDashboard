@@ -1,6 +1,6 @@
 body {
 	background: white;
-	font-family: "Source Sans Pro", Helvetica, sans-serif;
+	color: #333;
 }
 
 img[title="Home Page"] {
@@ -8,49 +8,64 @@ img[title="Home Page"] {
 	height: 30px;
 }
 
+.main.stackable {
+	margin: 0 .1%;
+}
+
+.ui.grid>.column:not(.row) {
+	padding-top: .5rem;
+	padding-bottom: .5rem;
+}
+
+.term-note {
+	text-align: left;
+	font-style: italic;
+	color: #999;
+	font-size: 1em;
+}
+
 .stat-percentile, .percentile {
-	font-weight: lighter;
-	color: #8A8C8F;
-	font-size: 0.8em;
-	padding: 0 0 0 1%;
+	text-align: center;
+	font-size: 1em;
+	padding: 0 0 0 .5%;
 }
 
 .percentile:hover {
 	font-weight: bold;
 	font-size: large;
 	color: #71C3E8;
+	/*color: #00A0E3;*/
 }
 
 .ui.progress .bar {
 	width: 95%;
 	background: #71C3E8;
+	/*background: #00A0E3;*/
 }
 
-.tbody
+.ui.divider {
+	margin: 2% 0;
+}
 
-.summary-stats, .progress-details {
+.progress-stats, .summary-stats, .progress-details {
 	table-layout: fixed;
 	width: 100%;
 	white-space: nowrap;
 }
 
-.summary-stats td, .progress-details td {
+.progress-stats td, .summary-stats td, .progress-details td {
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
-}
-
-.look {
-	font-weight: bold;
-	font-size: 1.3em;
+	height: 30px;
 }
 
 .progress-details {
-	margin: 0 2%;
+	margin-left: 1em;
 }
 
 .progress-details th {
-	padding-bottom: 0;
+	padding-bottom: .2em;
 }
 
 .progress-details td {
@@ -62,20 +77,32 @@ img[title="Home Page"] {
 	text-align: left;
 }
 
-.stat-name {
+.progress-stat {
+	width: 45%;
+}
+
+.progress-num {
+ 	width: 20%;
+}
+
+.progress-bar {
 	width: 30%;
 }
 
-.stat-num {
-	width: 15%;
-}
-
-.stat-bar {
+.stat-name {
 	width: 40%;
 }
 
+.stat-num {
+	width: 17%;
+}
+
+.stat-bar {
+	width: 30%;
+}
+
 .stat-percentile {
-	width: 15%;
+	width: 13%;
 }
 
 .ui .progress:last-child {
@@ -89,6 +116,7 @@ img[title="Home Page"] {
 .stat-title, .stat-data {
 	padding: 1%;
 	font-size: 1.1em;
+	color: #333;
 }
 
 .stat-title {
@@ -96,7 +124,10 @@ img[title="Home Page"] {
 }
 
 .stat-data {
+	padding-left: 2%;
+	padding-right: 2%;
 	text-align: center;
+	color: black;
 }
 
 .week-row {
@@ -146,14 +177,37 @@ img[title="Home Page"] {
 
 .problem-set {
 	display: inline-block;
+	padding-top: 1em;
+	padding-bottom: 1em;
 }
 
 .problem-id {
-	font-size: .9em;
-	color: #8A8C8F;
-	font-weight: lighter;
+	color: black;
+/*	color: #DE7DAE;*/
+/*	color: #71C3E8;*/
+/*	color: #8A8C8F;*/
+}
+
+.problem-total, .video-total {
+	color: black;
 }
 
 .ui.tiny.progress .bar {
 	background: #71C3E8;
+	/*background: #00A0E3;*/
+}
+
+.percent {
+	display: inline;
+	padding-left: 10%;
+}
+
+.look {
+	font-weight: bold;
+	font-size: 1.3em;
+	color: #545454;
+}
+.map {
+	width: 100%;
+	display:block;
 }

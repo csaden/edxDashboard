@@ -1,0 +1,214 @@
+---
+title: "edX"
+author: "Chris Saden"
+date: "January 17, 2015"
+output: html_document
+---
+```{r echo=FALSE, Load_Data}
+library(ggplot2)
+library(dplyr)
+theme_set(theme_minimal(16))
+
+problems <- read.csv("problems.csv", header=T,
+                     colClasses=c("character",
+                                  "factor",
+                                  "factor",
+                                  "integer"))
+
+videos <- read.csv("videos.csv", header=T,
+                   colClasses=c("character",
+                                "factor",
+                                "factor",
+                                "integer"))
+
+minutesPerDay <- read.csv("minutes_per_day.csv", header=T,
+                          colClasses=c("integer",
+                                       "Date",
+                                       "integer"))
+
+videoViews <- read.csv("video_views.csv", header=T,
+                       colClasses=c("integer",
+                                    "factor",
+                                    "factor",
+                                    "character",
+                                    "Date",
+                                    "integer",
+                                    "integer"))
+
+problemsAttempted <- read.csv("problem_attempts.csv", header=T,
+                       colClasses=c("integer",
+                                    "factor",
+                                    "factor",
+                                    "character",
+                                    "Date",
+                                    "integer",
+                                    "integer"))
+```
+
+```{r echo=FALSE, Video_Progress}
+totalVideoTime <- sum(videos$duration_seconds)
+
+videoProgress <- videoViews %>%
+    group_by(student_id) %>%
+    summarize(total_seconds = sum(watched_seconds),
+              currentProgress = sum(watched_seconds)/sum(duration_seconds),
+              totalProgress = sum(watched_seconds)/as.double(totalVideoTime))
+
+quantile(videoProgress$total_seconds, c(.05, .25, .50, .75, .95))
+quantile(videoProgress$currentProgress, c(.05, .25, .50, .75, .95))
+quantile(videoProgress$totalProgress, c(.05, .25, .50, .75, .95))
+
+boxplot(videoProgress$currentProgress)
+qplot(factor(0), currentProgress ,data=videoProgress, geom='boxplot')
+```
+
+```{r}
+minutesProgress <- minutesPerDay %>%
+    group_by(student_id) %>%
+    summarize(avg_minutes_per_day = mean(minutes_on_site),
+              median_minutes_per_day = median(minutes_on_site),
+              total_minutes_on_site = sum(minutes_on_site),
+              n=n())
+head(minutesProgress)
+boxplot(minutesProgress$avg_minutes_per_day)
+qplot(factor(0), minutesProgress$avg_minutes_per_day, geom="boxplot")
+```
+
+```{r}
+mean(sum(minutesProgress$total_minutes_on_site) / sum(minutesProgress$n))
+median(minutesProgress$median_minutes_per_day)
+
+minutesPerDay %>%
+    filter(student_id==0) %>%
+    ggplot(aes(x=date, y=minutes_on_site)) +
+        geom_bar(stat="identity") +
+    geom_hline(aes(yintercept=median(minutesProgress$median_minutes_per_day)), color="blue")
+
+avgMinutesPerDay <- minutesPerDay %>%
+    group_by(date) %>%
+    summarise(avg_minutes = mean(minutes_on_site),
+              n=n())
+
+# doesn't work as well because moving line is harder to interpret...threshold is easier with horizontal line, could probably do it on d3...R is picky
+minutesPerDay %>%
+    filter(student_id==18) %>%
+    ggplot(aes(x=date, y=minutes_on_site), color="blue") +
+        geom_bar(stat="identity") +
+    geom_line(aes(x=avgMinutesPerDay$date, y=avgMinutesPerDay$avg_minutes), color="grey")
+```
+
+```{r}
+#total possible points
+pointsPossible <- sum(problems$max_points)
+
+problemProgress <- problemsAttempted %>%
+    group_by(student_id) %>%
+    summarize(total_score = sum(score),
+              percent = percent(sum(score) / pointsPossible),
+              n = n())
+```
+
+``` {r}
+### Get student points and video time by lecture
+detailsBase <- read.csv("detailsBase.csv", header=T)
+
+scoresByLecture <- problemsAttempted %>%
+    group_by(student_id, subsection) %>%
+    summarize(lecture_points=sum(score))
+
+videosByLecture <- videoViews %>%
+    group_by(student_id, subsection) %>%
+    summarize
+
+detailsProgress <- merge(detailsBase, scoresByLecture, all.x=T)
+detailsProgress <- merge(detailsProgress, videosByLecture, all.x=T)
+detailsProgress[is.na(detailsProgress)] <- 0
+
+write.csv(detailsProgress, "details_progress.csv")
+```
+
+```{r}
+#Distribution of Main Data Points
+qplot(total_seconds, data=videoProgress, geom="histogram")
+qplot(total_minutes_on_site, data=minutesProgress, geom="histogram")
+qplot(total_score, data=problemProgress, geom="histogram")
+
+summary(videoProgress$total_seconds)
+summary(minutesProgress$total_minutes_on_site)
+summary(problemProgress$total_score)
+```
+
+
+```{r}
+allProgress <- data.frame(minutesProgress$student_id)
+```
+
+```{r}
+library(tidyr)
+
+allProblems <- spread(problemsAttempted[ , c(1,4,7)], problem_id, score)
+allVideos <- spread(videoViews[ , c(1,4,7)], video_id, watched_seconds)
+
+ids <- c("student_id", problems$id, videos$id)
+
+allProgress <- merge(minutesProgress, allProblems, by="student_id", all=T)
+allProgress <- merge(allProgress, allVideos, by="student_id", all=T)
+allProgress[is.na(allProgress)] <- 0
+
+# get total points earned on problems
+totalPoints <- subset(problemProgress, select = c(student_id, total_score))
+
+allProgress <- merge(allProgress, totalPoints, by="student_id", all=T)
+allProgress[is.na(allProgress)] <- 0                      
+
+# get total seconds of video viewed
+totalSeconds <- subset(videoProgress, select= c(student_id, total_seconds))
+
+allProgress <- merge(allProgress, totalSeconds, by="student_id", all=T)
+allProgress[is.na(allProgress)] <- 0
+```
+
+```{r}
+# Plot of video time watched vs points earned
+qplot(total_score, total_seconds, data=allProgress)
+
+# TRY K-MEANS CLUSTERING!
+
+# unscaled
+df <- subset(allProgress, select=c(total_score, total_seconds))
+kc6 <- kmeans(df, 6, iter.max=1000, nstart=1)
+
+#Organize data for plotting
+df$cluster=factor(kc6$cluster)
+centers=as.data.frame(kc6$centers)
+
+# scale the data
+progressScaled = data.frame(scale(data.frame(subset(allProgress, select=c(total_score, total_seconds)))))
+
+#
+kc6 <- kmeans(progressScaled, 6, iter.max=1000, nstart=1)
+
+#Organize data for plotting
+progressScaled$cluster=factor(kc6$cluster)
+centers=as.data.frame(kc6$centers)
+
+cbPalette <- c("#0072B2", "#56B4E9", "#009E73", "#F0E442", "#E69F00", "#D55E00", "#C9C9C9")
+
+#Visualize with ggplot
+ggplot(data=progressScaled,
+       aes(x=total_score, y=total_seconds, color=cluster)) +
+    geom_point() + 
+    geom_point(data=centers,
+               aes(x=total_score, y=total_seconds, color="Center")) +
+    geom_point(data=centers,
+               aes(x=total_score,y=total_seconds, color="Center"),
+               size=52, alpha=.3, show_guide=FALSE) +
+    scale_color_manual(values=cbPalette)
+```
+
+
+```{r}
+setwd("~/edxDashboard/app/data/")
+write.csv(allProgress, "all_progress.csv", row.names=F)
+```
+
