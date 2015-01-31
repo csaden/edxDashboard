@@ -120,11 +120,11 @@ videosByLecture <- videoViews %>%
     group_by(student_id, subsection) %>%
     summarize
 
-detailsProgress <- merge(detailsBase, scoresByLecture, all.x=T)
-detailsProgress <- merge(detailsProgress, videosByLecture, all.x=T)
-detailsProgress[is.na(detailsProgress)] <- 0
+progressByLecture <- merge(detailsBase, scoresByLecture, all.x=T)
+progressByLecture <- merge(progressByLecture, videosByLecture, all.x=T)
+progressByLecture[is.na(progressByLecture)] <- 0
 
-write.csv(detailsProgress, "details_progress.csv")
+write.csv(progressByLecture, "details_progress.csv")
 ```
 
 ```{r}

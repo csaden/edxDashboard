@@ -40,8 +40,10 @@ function processData(allText) {
 		
 		line.forEach(function(text) {
 			
-			var keyValue = text.split(":");
-			newDataObject[keyValue[0]] = keyValue[1];
+			var keyValuePair = text.split(":");
+			var key = keyValuePair[0].replace(/"/g, "");
+			var value = keyValuePair[1];
+			newDataObject[key] = value;
 		});
 		
 		processedData.push(newDataObject);
@@ -101,8 +103,6 @@ function getCourseMap(detailsArray) {
 }
 
 function drawBarContainer(id, width, height) {
-
-	console.log(id);
 
 	var svg = d3.select(id)
 		.append("svg")

@@ -15,6 +15,8 @@ $(function() {
 			modelThis.lectureVideoTimeTotals = null;
 			modelThis.visits = null;
 			modelThis.avgTimePerDay = null;
+			modelThis.pointsPercentile = null;
+			modelThis.videoTimePercentile = null;
 
 			// add this information?
 			modelThis.lastNode = null;
@@ -32,6 +34,8 @@ $(function() {
 			modelThis.lectures = [];
 			modelThis.details = null;
 			modelThis.courseMap = null;
+			modelThis.allTotalPoints = [];
+			modelThis.allVideoTime = [];
 
 			//values to compute
 			modelThis.possiblePoints = null;
@@ -42,11 +46,13 @@ $(function() {
 
 			$( document ).ready(function() {
 
+				// toggle menu on small devices
 				$(".right.menu.open").on("click", function(e) {
 					e.preventDefault();
 					$(".ui.vertical.menu").toggle();
 				});
 
+				// toggle nav on large devices
 				$("#nav a.item").on("click", function() {
 					$(this).addClass("active")
 						.siblings()
@@ -71,7 +77,8 @@ $(function() {
 					modelThis.minutesPerDay = processData(e[0]);
 					modelThis.allProgress = processData(f[0]);
 
-					//parse and format minutesPerDay data to plot later
+					// get and format minutesPerDay data to plot later
+					// get student IDs at same time for dropdown
 					modelThis.minutesPerDay.forEach(function(elem) {
 						modelThis.studentIds.push(+elem.student_id);
 						elem.student_id = +elem.student_id;
@@ -79,12 +86,12 @@ $(function() {
 						elem.minutes_on_site = +elem.minutes_on_site;
 					});
 
-
+					//
 					modelThis.studentIds = d3.set(modelThis.studentIds)
 						.values()
 						.map(Number);
 
-					//parse general problems data
+					// get general information on all problems
 					modelThis.details = d3.nest()
 						.key(function(d) { return d.section; })
 						.key(function(d) { return d.subsection; })
@@ -113,7 +120,7 @@ $(function() {
 
 					modelThis.details = _allProblems;
 
-					//parse general videos data
+					// get general information on all videos
 					modelThis.videos = d3.nest()
 						.key(function(d) { return d.section; })
 						.key(function(d) { return d.subsection; })
@@ -140,6 +147,8 @@ $(function() {
 					}
 					modelThis.videos = _allVideos;
 
+					// combine info from all problems and videos
+					// by week and lecture
 					var detailsLength = modelThis.details.length;
 
 					for (var i = 0; i < detailsLength; i++) {
@@ -154,15 +163,18 @@ $(function() {
 						}
 					}
 
+					// set max points for course
 					modelThis.possiblePoints = d3.sum(modelThis.problems,
 						function(d) {
 							return +d.max_points;
 						});
 
+					// set max video time for course
 					modelThis.possibleVideoTime = d3.sum(modelThis.videos, function(d) {
 						return +d.max_total_time;
 					});
 
+					// get video progress for accesssed videos by student
 					modelThis.videoProgress = d3.nest()
 						.key(function(d) { return d.student_id; })
 						.rollup(function(d) {
@@ -176,14 +188,28 @@ $(function() {
 							};
 						}).entries(modelThis.videoViews);
 
+					// get problem and video ids to build course map
 					modelThis.courseMap = getCourseMap(modelThis.details);
 
+					// get and format lecture ids for details table
 					modelThis.details.forEach(function(elem) {
 						if (elem.hasOwnProperty("lecture")) {
 							var lectName = elem.lecture.replace(/\s+/g, '-');
 							modelThis.lectures.push(lectName);
 						}
 					});
+
+					// populate arrays of total video time and points
+					// for percentile calculation
+					modelThis.allProgress.forEach(function(elem) {
+						if (elem.hasOwnProperty("total_score")) {
+							var score = +elem.total_score;
+							var videoTime = +elem.total_seconds;
+							modelThis.allTotalPoints.push(score);
+							modelThis.allVideoTime.push(videoTime);
+						}
+					});
+
 					view.init();
 				});
 			});
@@ -265,9 +291,6 @@ $(function() {
 		getVisits : function(studentId) {
 			return modelThis.visits;
 		},
-		getAvgTimePerDay : function(studentId) {
-			return modelThis.avgTimePerDay;
-		},
 		getProgressPoints : function() {
 			return modelThis.progressPoints;
 		},
@@ -288,6 +311,20 @@ $(function() {
 		},
 		getDetails : function() {
 			return modelThis.details;
+		},
+		getPointsPercentile : function() {
+			var percentile = d3.scale.quantile()
+				.domain(d3.extent(modelThis.allTotalPoints))
+				.range(d3.range(1, 100));
+			console.log(percentile(modelThis.attemptedPoints));
+			return percentile(modelThis.attemptedPoints);
+		},
+		getVideoTimePercentile : function () {
+			var percentile = d3.scale.quantile()
+				.domain(d3.extent(modelThis.allVideoTime))
+				.range(d3.range(1, 100));
+			console.log(percentile(modelThis.attemptedVideoTime));
+			return percentile(modelThis.attemptedVideoTime);
 		},
 		getCurrentGrade : function() {
 			var grade = Math.round(ctrl.getProgressPoints() / ctrl.getPossiblePoints() * 100);
@@ -380,7 +417,7 @@ $(function() {
 
 			weekRow.append("td")
 				.attr("class", "problem-bar")
-				.attr("id", function(d) { 
+				.attr("id", function(d) {
 					return d.lecture.replace(/\s+/g, '-');
 				});
 
@@ -442,6 +479,10 @@ $(function() {
 			d3.select("#total-possible-time").text(formatTime(ctrl.getPossibleVideoTime()));
 			
 			d3.select("#current-grade").text(ctrl.getCurrentGrade());
+
+			d3.select("#points-percentile").text(ctrl.getPointsPercentile() + "%");
+
+			d3.select("#video-time-percentile").text(ctrl.getVideoTimePercentile() + "%");
 		}
 	};
 	ctrl.init();
