@@ -11,8 +11,7 @@ $(function() {
 			modelThis.attemptedPoints = null;
 			modelThis.progressVideoTime = null;
 			modelThis.attemptedVideoTime = null;
-			modelThis.lecturePointTotals = null;
-			modelThis.lectureVideoTimeTotals = null;
+			modelThis.progressByLecture = null;
 			modelThis.visits = null;
 			modelThis.avgTimePerDay = null;
 			modelThis.pointsPercentile = null;
@@ -21,15 +20,19 @@ $(function() {
 			// add this information?
 			modelThis.lastNode = null;
 
-			//csv data
-			modelThis.allProgress = null;
+			// original csv data
 			modelThis.minutesPerDay = null;
 			modelThis.problems = null;
 			modelThis.problemAttempts = null;
 			modelThis.videos = null;
 			modelThis.videoViews = null;
 
-			//parsed data
+			// data created from manipulating original csv data
+			// using R / RStudio
+			modelThis.allProgress = null;
+			modelThis.allProgressByLecture = null;
+
+			//parsed data from munging csv files
 			modelThis.studentIds = [];
 			modelThis.lectures = [];
 			modelThis.details = null;
@@ -66,9 +69,10 @@ $(function() {
 					getData("data/videos.csv"),
 					getData("data/video_views.csv"),
 					getData("data/minutes_per_day.csv"),
-					getData("data/all_progress.csv")
+					getData("data/all_progress.csv"),
+					getData("data/progress_by_lecture.csv")
 				
-				).done(function(a, b, c, d, e, f) {
+				).done(function(a, b, c, d, e, f, g) {
 
 					modelThis.problems = processData(a[0]);
 					modelThis.problemAttempts = processData(b[0]);
@@ -76,6 +80,7 @@ $(function() {
 					modelThis.videoViews = processData(d[0]);
 					modelThis.minutesPerDay = processData(e[0]);
 					modelThis.allProgress = processData(f[0]);
+					modelThis.allProgressByLecture = processData(g[0]);
 
 					// get and format minutesPerDay data to plot later
 					// get student IDs at same time for dropdown
@@ -149,9 +154,7 @@ $(function() {
 
 					// combine info from all problems and videos
 					// by week and lecture
-					var detailsLength = modelThis.details.length;
-
-					for (var i = 0; i < detailsLength; i++) {
+					for (var i = 0, l = modelThis.details.length; i < l; i++) {
 
 						var thisWeek = modelThis.details[i].week;
 						var thisLecture = modelThis.details[i].lecture;
@@ -221,11 +224,11 @@ $(function() {
 			model.init();
 		},
 		setCurrentStudent : function(studentId) {
-			model.currentStudent = studentId;
+			model.currentStudent = +studentId;
 		},
 		setPointsData : function(studentId) {
 			var problems = modelThis.problemAttempts.filter(function(element) {
-				return element.student_id == studentId;
+				return +element.student_id === +studentId;
 			}, studentId);
 
 			if (problems.length > 0) {
@@ -243,7 +246,7 @@ $(function() {
 		},
 		setVideosData : function(studentId) {
 			var videos = modelThis.videoViews.filter(function(element) {
-				return element.student_id == studentId;
+				return +element.student_id === +studentId;
 			}, studentId);
 
 			if (videos.length > 0) {
@@ -257,11 +260,7 @@ $(function() {
 			}
 		},
 		setVisits : function(studentId) {
-			var visits = modelThis.minutesPerDay.filter(function(element) {
-				return element.student_id === +studentId;
-			}, studentId);
-
-			modelThis.visits = visits;
+			modelThis.visits = modelThis.minutesPerDay.filter(function(element) { return +element.student_id === +studentId; }, studentId);
 		},
 		setAvgTimePerDay : function(studentId) {
 			var avgTimePerDay;
@@ -275,6 +274,22 @@ $(function() {
 				avgTimePerDay = 0;
 			}
 			modelThis.avgTimePerDay = avgTimePerDay;
+		},
+		setProgressByLecture : function(studentId) {
+			modelThis.progressByLecture = [];
+
+			modelThis.allProgressByLecture.forEach(function(elem) {
+				if (+elem.student_id === +studentId) {
+					modelThis.progressByLecture.push(
+						{
+							lecture_points: +elem.lecture_points,
+							student_id: +elem.student_id,
+							subsection: elem.subsection,
+							watched_seconds: +elem.watched_seconds
+						}
+					);
+				}
+			}, studentId);
 		},
 		getAvgTimePerDay : function() {
 			return modelThis.avgTimePerDay;
@@ -309,6 +324,9 @@ $(function() {
 		getPossibleVideoTime : function() {
 			return modelThis.possibleVideoTime;
 		},
+		getProgressByLecture : function() {
+			return modelThis.progressByLecture;
+		},
 		getDetails : function() {
 			return modelThis.details;
 		},
@@ -316,26 +334,24 @@ $(function() {
 			var percentile = d3.scale.quantile()
 				.domain(d3.extent(modelThis.allTotalPoints))
 				.range(d3.range(1, 100));
-			console.log(percentile(modelThis.attemptedPoints));
 			return percentile(modelThis.attemptedPoints);
 		},
 		getVideoTimePercentile : function () {
 			var percentile = d3.scale.quantile()
 				.domain(d3.extent(modelThis.allVideoTime))
 				.range(d3.range(1, 100));
-			console.log(percentile(modelThis.attemptedVideoTime));
 			return percentile(modelThis.attemptedVideoTime);
 		},
 		getCurrentGrade : function() {
 			var grade = Math.round(ctrl.getProgressPoints() / ctrl.getPossiblePoints() * 100);
 			if (55 <= grade && grade <= 64) {
-				grade += "% C";
+				grade += ("% " + " C");
 			} else if (65 <= grade && grade <= 79) {
-				grade += "% B";
+				grade += ("% " + " B");
 			} else if (80 <= grade && grade <= 100) {
-				grade += "% A";
+				grade += ("% " + " A");
 			} else if (grade > 100) {
-				grade += "% A+";
+				grade += ("% " + " A+");
 			} else {
 				grade += "%";
 			}
@@ -346,6 +362,7 @@ $(function() {
 			this.setPointsData(studentId);
 			this.setVisits(studentId);
 			this.setAvgTimePerDay(studentId);
+			this.setProgressByLecture(studentId);
 		}
 	};
 
@@ -360,14 +377,8 @@ $(function() {
 			drawBarContainer("#total-points-bar", 150, 30);
 			drawBarContainer("#total-video-time-bar", 150, 30);
 
-			var lectures = ctrl.getLectures();
-
-			for (var idx in lectures) {
-				var elemId = "#" + lectures[idx];
-				drawBarContainer(elemId, 150, 30);
-				elemId += "-vid";
-				drawBarContainer(elemId, 150, 30);
-			}
+			drawBarContainer(".problem-bar", 150, 30);
+			drawBarContainer(".video-bar", 150, 30);
 
 			$(":input[name='currentStudent']").on("change", function() {
 				ctrl.setCurrentStudent(this.value);
@@ -413,12 +424,16 @@ $(function() {
 
 			weekRow.append("td")
 				.attr("class", "problem-total")
-				.attr("value", function(d) { return d.max_total_points; });
+				.attr("value", function(d) { return +d.max_total_points; })
+				.attr("id", function(d) {
+					return d.lecture.replace(/\s+/g, '-') + "-problems";
+				});
 
 			weekRow.append("td")
 				.attr("class", "problem-bar")
+				.attr("value", function(d) { return +d.max_total_points; })
 				.attr("id", function(d) {
-					return d.lecture.replace(/\s+/g, '-');
+					return d.lecture.replace(/\s+/g, '-') + "-prob-bar";
 				});
 
 			weekRow.each(function(d) {
@@ -440,14 +455,16 @@ $(function() {
 
 			weekRow.append("td")
 				.attr("class", "video-total")
-				.text(function(d) { return d.max_total_time; });
+				.attr("value", function(d) { return +d.max_total_time; })
+				.attr("id", function(d) {
+					return d.lecture.replace(/\s+/g, '-') + "-videos";
+				});
 
 			weekRow.append("td")
 				.attr("class", "video-bar")
+				.attr("value", function(d) { return +d.max_total_time; })
 				.attr("id", function(d) {
-					var idName = d.lecture.replace(/\s+/g, '-');
-					idName += "-vid";
-					return idName;
+					return d.lecture.replace(/\s+/g, '-') + "-video-bar";
 				});
 		},
 		render : function() {
@@ -463,6 +480,34 @@ $(function() {
 			drawBar("#total-points-bar", 150, 30, ctrl.getProgressPoints(), ctrl.getPossiblePoints());
 			
 			drawBar("#total-video-time-bar", 150, 30, ctrl.getProgressVideoTime(), ctrl.getPossibleVideoTime());
+
+			// bind progressByLecture data to the details table
+			var lectureData,// to hold current student progress by lecture
+				elem, 		// elem to bind to
+				lect, 		// base of lecture for id of elem
+				o; 			// data object
+
+			lectureData = ctrl.getProgressByLecture();
+			for (var i=0, l=lectureData.length; i < l; i++) {
+				
+				o = lectureData[i];
+				lect = "#" + o.subsection;
+				
+				// bind problem data to table
+				elem = d3.select(lect + "-problems");
+				elem.text( o.lecture_points + "/" + elem.attr("value") );
+				debugger;
+				// draw bar for points total by lecture
+				drawBar(lect + "-prob-bar", 150, 30, o.lecture_points, +elem.attr("value"));
+				debugger;
+				// bind video data to table
+				elem = d3.select(lect + "-videos");
+				elem.text( o.watched_seconds + "/" + elem.attr("value") );
+
+				// draw bar for video seconds watched by lecture
+				drawBar(lect + "-video-bar", 150, 30, o.watched_seconds, +elem.attr("value"));
+
+			}
 
 			d3.select("#daily-time").text("~" + ctrl.getAvgTimePerDay() + " min");
 			

@@ -1,4 +1,5 @@
 body {
+	font: Helvetica Arial sans-serif;
 	background: white;
 	color: #333;
 }
@@ -9,7 +10,7 @@ img[title="Home Page"] {
 }
 
 .main.stackable {
-	margin: 0 .1%;
+	margin: 0 .2%;
 }
 
 .ui.grid>.column:not(.row) {
@@ -30,11 +31,12 @@ img[title="Home Page"] {
 	padding: 0 0 0 .5%;
 }
 
-.percentile:hover {
+.percentile {
 	font-weight: bold;
 	font-size: large;
-	color: #71C3E8;
-	/*color: #00A0E3;*/
+	color: #B72667;  /*	dark pink */
+	/*color: #00A0E3; 	dark blue*/
+	/*color : #DE7DAE; 	light pink */
 }
 
 .ui.progress .bar {

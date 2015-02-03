@@ -110,21 +110,26 @@ problemProgress <- problemsAttempted %>%
 
 ``` {r}
 ### Get student points and video time by lecture
-detailsBase <- read.csv("detailsBase.csv", header=T)
+detailsBase <- read.csv("details_base.csv", header=T)
 
 scoresByLecture <- problemsAttempted %>%
     group_by(student_id, subsection) %>%
     summarize(lecture_points=sum(score))
+scoresByLecture$subsection <- gsub(" ", "-", scoresByLecture$subsection)
 
 videosByLecture <- videoViews %>%
     group_by(student_id, subsection) %>%
-    summarize
+    summarize(watched_seconds = sum(watched_seconds))
+videosByLecture$subsection <- gsub(" ", "-", videosByLecture$subsection)
+
+
 
 progressByLecture <- merge(detailsBase, scoresByLecture, all.x=T)
 progressByLecture <- merge(progressByLecture, videosByLecture, all.x=T)
 progressByLecture[is.na(progressByLecture)] <- 0
 
-write.csv(progressByLecture, "details_progress.csv")
+write.csv(progressByLecture, "progress_by_lecture.csv",
+          row.names=F, quote=F)
 ```
 
 ```{r}

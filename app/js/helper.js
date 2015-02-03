@@ -102,9 +102,9 @@ function getCourseMap(detailsArray) {
 	return allNodes;
 }
 
-function drawBarContainer(id, width, height) {
+function drawBarContainer(selector, width, height) {
 
-	var svg = d3.select(id)
+	var svg = d3.selectAll(selector)
 		.append("svg")
 		.attr("width", width)
 		.attr("height", height)
