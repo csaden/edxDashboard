@@ -16,6 +16,7 @@ $(function() {
 			modelThis.avgTimePerDay = null;
 			modelThis.pointsPercentile = null;
 			modelThis.videoTimePercentile = null;
+			modelThis.detailsProgress= null;
 
 			// add this information?
 			modelThis.lastNode = null;
@@ -245,8 +246,8 @@ $(function() {
 			}
 		},
 		setVideosData : function(studentId) {
-			var videos = modelThis.videoViews.filter(function(element) {
-				return +element.student_id === +studentId;
+			var videos = modelThis.videoViews.filter(function(record) {
+				return +record.student_id === +studentId;
 			}, studentId);
 
 			if (videos.length > 0) {
@@ -260,7 +261,7 @@ $(function() {
 			}
 		},
 		setVisits : function(studentId) {
-			modelThis.visits = modelThis.minutesPerDay.filter(function(element) { return +element.student_id === +studentId; }, studentId);
+			modelThis.visits = modelThis.minutesPerDay.filter(function(record) { return +record.student_id === +studentId; }, studentId);
 		},
 		setAvgTimePerDay : function(studentId) {
 			var avgTimePerDay;
@@ -278,18 +279,24 @@ $(function() {
 		setProgressByLecture : function(studentId) {
 			modelThis.progressByLecture = [];
 
-			modelThis.allProgressByLecture.forEach(function(elem) {
-				if (+elem.student_id === +studentId) {
+			modelThis.allProgressByLecture.forEach(function(record) {
+				if (+record.student_id === +studentId) {
 					modelThis.progressByLecture.push(
 						{
-							lecture_points: +elem.lecture_points,
-							student_id: +elem.student_id,
-							subsection: elem.subsection,
-							watched_seconds: +elem.watched_seconds
+							lecture_points: +record.lecture_points,
+							student_id: +record.student_id,
+							subsection: record.subsection,
+							watched_seconds: +record.watched_seconds
 						}
 					);
 				}
 			}, studentId);
+		},
+		setDetailsProgress : function(studentId) {
+			modelThis.detailsProgress = modelThis.allProgress.filter(function(record) { return +record.student_id === +studentId; }, studentId)[0];
+		},
+		getDetailsProgress : function() {
+			return modelThis.detailsProgress;
 		},
 		getAvgTimePerDay : function() {
 			return modelThis.avgTimePerDay;
@@ -363,6 +370,7 @@ $(function() {
 			this.setVisits(studentId);
 			this.setAvgTimePerDay(studentId);
 			this.setProgressByLecture(studentId);
+			this.setDetailsProgress(studentId);
 		}
 	};
 
@@ -448,7 +456,9 @@ $(function() {
 					current.append("td")
 						.attr("class", "problem-id")
 						.attr("id", d.problems[i].id)
-						.text("0" + "/" + d.problems[i].max_points);
+						.attr("value", function(d) {
+							return +d.problems[i].max_points;
+						});
 				}
 
 			});
@@ -468,11 +478,14 @@ $(function() {
 				});
 		},
 		render : function() {
+			
+			// remove current data .inner-rect from the page
 			d3.selectAll(".inner-rect").transition()
 				.duration(500)
 				.attr("width", 0)
 				.remove();
-			
+
+			// draw four main bars for work in progress and total progress
 			drawBar("#progress-points-bar", 150, 30, ctrl.getProgressPoints(), ctrl.getAttemptedPoints());
 			
 			drawBar("#progress-video-time-bar", 150, 30, ctrl.getProgressVideoTime(), ctrl.getAttemptedVideoTime());
@@ -481,34 +494,7 @@ $(function() {
 			
 			drawBar("#total-video-time-bar", 150, 30, ctrl.getProgressVideoTime(), ctrl.getPossibleVideoTime());
 
-			// bind progressByLecture data to the details table
-			var lectureData,// to hold current student progress by lecture
-				elem, 		// elem to bind to
-				lect, 		// base of lecture for id of elem
-				o; 			// data object
-
-			lectureData = ctrl.getProgressByLecture();
-			for (var i=0, l=lectureData.length; i < l; i++) {
-				
-				o = lectureData[i];
-				lect = "#" + o.subsection;
-				
-				// bind problem data to table
-				elem = d3.select(lect + "-problems");
-				elem.text( o.lecture_points + "/" + elem.attr("value") );
-				debugger;
-				// draw bar for points total by lecture
-				drawBar(lect + "-prob-bar", 150, 30, o.lecture_points, +elem.attr("value"));
-				debugger;
-				// bind video data to table
-				elem = d3.select(lect + "-videos");
-				elem.text( o.watched_seconds + "/" + elem.attr("value") );
-
-				// draw bar for video seconds watched by lecture
-				drawBar(lect + "-video-bar", 150, 30, o.watched_seconds, +elem.attr("value"));
-
-			}
-
+			//bind summary data to top two tables
 			d3.select("#daily-time").text("~" + ctrl.getAvgTimePerDay() + " min");
 			
 			d3.select("#progress-points").text(ctrl.getProgressPoints() + " / " + ctrl.getAttemptedPoints());
@@ -528,6 +514,43 @@ $(function() {
 			d3.select("#points-percentile").text(ctrl.getPointsPercentile() + "%");
 
 			d3.select("#video-time-percentile").text(ctrl.getVideoTimePercentile() + "%");
+
+			// bind progressByLecture data to the details table
+			var lectureData, // student progress by lecture
+				elem, //HTML elem to bind the data
+				lect, //lecture name for id of elem; will add suffix
+				o; // one lecture record for student in lectureData
+
+			lectureData = ctrl.getProgressByLecture();
+			for (var i=0, l=lectureData.length; i < l; i++) {
+				
+				o = lectureData[i];
+				lect = "#" + o.subsection;
+				
+				// bind problem data to table
+				elem = d3.select(lect + "-problems");
+				elem.text( o.lecture_points + "/" + elem.attr("value") );
+
+				// draw bar for points total by lecture
+				drawBar(lect + "-prob-bar", 150, 30, o.lecture_points, +elem.attr("value"));
+
+				// bind video data to table
+				elem = d3.select(lect + "-videos");
+				elem.text( o.watched_seconds + "/" + elem.attr("value") );
+
+				// draw bar for video seconds watched by lecture
+				drawBar(lect + "-video-bar", 150, 30, o.watched_seconds, +elem.attr("value"));
+
+			}
+
+			//bind data to individual problem scores
+			var details = ctrl.getDetailsProgress();
+			for ( var key in details ) {
+				if ( key.match(/^lec[0-9]+_p[0-9]+$/) !== null ) {
+					elem = d3.select("#" + key);
+					elem.text(details[key] + "/" + elem.attr("value"));
+				}
+			}
 		}
 	};
 	ctrl.init();
