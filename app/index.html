@@ -4,10 +4,10 @@
 	<meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1">
 	<title>Course Progress</title>
 	
-	<link rel="stylesheet" type="text/css" href="bower_components/semantic-ui/dist/semantic.min.css"></link>
+	<link href="bower_components/semantic-ui/dist/semantic.min.css" rel="stylesheet" type="text/css" ></link>
 <!-- https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.8.1/semantic.min.css -->
-	<link rel="stylesheet" type="text/css" href="css/dashboard.css"></link>
-
+	<link href="css/dashboard.css" rel="stylesheet" type="text/css"></link>
+	<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro' rel='stylesheet' type="text/css">
 <!-- 	<link rel="stylesheet" type="text/css" href="css/media_query_reporter.css"> -->
 
 <!-- CDN LINKS FOR JS LIBRARIES -->
@@ -176,18 +176,20 @@
 
 <div class="ui divider"></div>
 
-<div class="main ui three column stackable grid">
+<div class="main ui two column stackable grid">
 	
-	<div class="eight wide column column-addon left floated">	
-		<div id="attendance" class="look">Site Visit Durations</div>
+	<div class="twelve wide column column-addon left floated">	
+		<div id="attendance" class="look">Daily Time on Site
+			<div id="attendance-chart"></div>
+		</div>
 	</div>
 	
-	<div class="four wide column column-addon left floated">
+<!-- 	<div class="four wide column column-addon left floated">
 		<div id="call-to-action">
 			<div class="look">What Should I do next?</div>
 			<div>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.</div>
 		</div>
-	</div>
+	</div> -->
 
 	<div class="four wide column column-addon left floated">
 		<div id="grade-distribution" class="look">Grade Distribution/Other Data?</div>

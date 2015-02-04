@@ -1,5 +1,5 @@
 body {
-	font: Helvetica Arial sans-serif;
+	font: "Source Sans Pro" Helvetica Arial sans-serif;
 	background: white;
 	color: #333;
 }
@@ -32,8 +32,7 @@ img[title="Home Page"] {
 }
 
 .percentile {
-	font-weight: bold;
-	font-size: large;
+	font-size: 1.05em;
 	color: #B72667;  /*	dark pink */
 	/*color: #00A0E3; 	dark blue*/
 	/*color : #DE7DAE; 	light pink */
@@ -184,14 +183,17 @@ img[title="Home Page"] {
 }
 
 .problem-id {
-	color: black;
+	color: dimgray;
+	font-size: .85em;
 /*	color: #DE7DAE;*/
 /*	color: #71C3E8;*/
 /*	color: #8A8C8F;*/
 }
 
 .problem-total, .video-total {
-	color: black;
+	/*color: black;*/
+	font-size: 1.05em;
+	color: #B72667;  /*	dark pink */
 }
 
 .ui.tiny.progress .bar {
@@ -212,4 +214,18 @@ img[title="Home Page"] {
 .map {
 	width: 100%;
 	display:block;
+}
+
+.axis {
+	font: 10px sans-serif;
+}
+
+path, line {
+	fill: none;
+	stroke: #000;
+	shape-rendering: crispEdges;
+}
+
+text {
+	font-size: .6em;
 }

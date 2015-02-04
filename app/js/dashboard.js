@@ -40,6 +40,8 @@ $(function() {
 			modelThis.courseMap = null;
 			modelThis.allTotalPoints = [];
 			modelThis.allVideoTime = [];
+			modelThis.dateExtents = null;
+			modelThis.timeExtents = null;
 
 			//values to compute
 			modelThis.possiblePoints = null;
@@ -92,10 +94,17 @@ $(function() {
 						elem.minutes_on_site = +elem.minutes_on_site;
 					});
 
-					//
+					// get unique student IDs as numbers
 					modelThis.studentIds = d3.set(modelThis.studentIds)
 						.values()
 						.map(Number);
+
+					// get max and min date for site visits
+					modelThis.dateExtents = d3.extent(modelThis.minutesPerDay, function(d) { return d.date; });
+
+					// get max minutes for site visits
+					modelThis.timeExtents = [0, d3.max(modelThis.minutesPerDay,
+						function(d) { return d.minutes_on_site; })];
 
 					// get general information on all problems
 					modelThis.details = d3.nest()
@@ -334,6 +343,15 @@ $(function() {
 		getProgressByLecture : function() {
 			return modelThis.progressByLecture;
 		},
+		getMinutesPerDay : function() {
+			return modelThis.minutesPerDay;
+		},
+		getDateExtents : function() {
+			return modelThis.dateExtents;
+		},
+		getTimeExtents : function() {
+			return modelThis.timeExtents;
+		},
 		getDetails : function() {
 			return modelThis.details;
 		},
@@ -477,12 +495,114 @@ $(function() {
 					return d.lecture.replace(/\s+/g, '-') + "-video-bar";
 				});
 		},
+		createTimeOnSiteGraph : function(records, wid, hgt) {
+
+			var margin = {top: 20, right: 0, bottom: 60, left: 60},
+				width = wid - margin.left - margin.right,
+				height = hgt - margin.top - margin.bottom;
+
+			var svg = d3.select("#attendance-chart")
+				.append("svg")
+				.attr("class", "time-on-site-graph")
+				.attr("width", width + margin.left + margin.right)
+				.attr("height", height + margin.top + margin.bottom)
+				.append("g")
+				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+			// set the scales for the x and y axis
+			var x = d3.time.scale()
+					.domain(ctrl.getDateExtents())
+					.range([0, width]),
+				
+				y = d3.scale.linear()
+					.domain(ctrl.getTimeExtents())
+					.range([height, 0]);
+
+			// draw xAxis
+			var xAxis = d3.svg.axis()
+				.scale(x)
+				.orient("bottom")
+				.tickFormat(d3.time.format("%x"));
+
+			var xAxisG = svg.append("g")
+				.attr("class", "x-axis")
+				.attr("transform", "translate(0," + height + ")");
+
+			xAxisG.transition()
+				.duration(1000)
+				.call(xAxis);
+
+			xAxisG.selectAll("text")
+				.attr("transform", "rotate(-45)")
+				.attr("dy", ".5em")
+				.attr("dx", "-.7em")
+				.style("text-anchor", "end");
+
+			// draw yAxis
+			var yAxis = d3.svg.axis()
+				.scale(y)
+				.orient("left");
+
+			var yAxisG = svg.append("g")
+				.attr("class", "y-axis");
+
+			yAxisG.transition()
+				.duration(1000)
+				.call(yAxis);
+
+			yAxisG.append("text")
+				.attr("transform", "rotate(-90)")
+				.attr("x", -40)
+				.attr("y", -50)
+				.attr("dy", ".7em")
+				.attr("text-anchor", "end")
+				.text("Minutes");
+
+			var xDomain = ctrl.getDateExtents();
+
+			// set the bar width
+			var barWidth = width / Math.floor(( xDomain[1] - xDomain[0]) / 86400000);
+
+			d3.selectAll(".attendance-bars")
+				.transition()
+				.duration(500)
+				.attr("y", height)
+				.attr("height", 0)
+				.remove();
+
+			var bars = svg.selectAll("rect")
+				.data(records)
+				.enter()
+				.append("rect")
+				.attr("class", "attendance-bars")
+				.style("fill", "#71C3E8")
+				.attr("x", function(d) {
+					return x(d.date);
+				})
+				.attr("y", function(d) {
+					return height;
+				})
+				.attr("width", barWidth - 2)
+				.attr("height", 0)
+				.transition()
+				.duration(2000)
+				.attr("height", function(d) {
+					return height - y(d.minutes_on_site);
+				})
+				.attr("y", function(d) {
+					return y(d.minutes_on_site);
+				})
+		},
 		render : function() {
 			
 			// remove current data .inner-rect from the page
-			d3.selectAll(".inner-rect").transition()
+			d3.selectAll(".inner-rect")
+				.transition()
 				.duration(500)
 				.attr("width", 0)
+				.remove();
+
+			d3.select(".time-on-site-graph")
 				.remove();
 
 			// draw four main bars for work in progress and total progress
@@ -494,7 +614,7 @@ $(function() {
 			
 			drawBar("#total-video-time-bar", 150, 30, ctrl.getProgressVideoTime(), ctrl.getPossibleVideoTime());
 
-			//bind summary data to top two tables
+			// bind summary data to top two tables
 			d3.select("#daily-time").text("~" + ctrl.getAvgTimePerDay() + " min");
 			
 			d3.select("#progress-points").text(ctrl.getProgressPoints() + " / " + ctrl.getAttemptedPoints());
@@ -517,8 +637,8 @@ $(function() {
 
 			// bind progressByLecture data to the details table
 			var lectureData, // student progress by lecture
-				elem, //HTML elem to bind the data
-				lect, //lecture name for id of elem; will add suffix
+				elem, // HTML elem to bind the data
+				lect, // lecture name for id of elem; will add suffix
 				o; // one lecture record for student in lectureData
 
 			lectureData = ctrl.getProgressByLecture();
@@ -529,28 +649,32 @@ $(function() {
 				
 				// bind problem data to table
 				elem = d3.select(lect + "-problems");
-				elem.text( o.lecture_points + "/" + elem.attr("value") );
+				elem.text( o.lecture_points + " / " + elem.attr("value") );
 
 				// draw bar for points total by lecture
 				drawBar(lect + "-prob-bar", 150, 30, o.lecture_points, +elem.attr("value"));
 
 				// bind video data to table
 				elem = d3.select(lect + "-videos");
-				elem.text( o.watched_seconds + "/" + elem.attr("value") );
+				elem.text( o.watched_seconds + " / " + elem.attr("value") );
 
 				// draw bar for video seconds watched by lecture
 				drawBar(lect + "-video-bar", 150, 30, o.watched_seconds, +elem.attr("value"));
 
 			}
 
-			//bind data to individual problem scores
+			// bind data to individual problem scores
 			var details = ctrl.getDetailsProgress();
 			for ( var key in details ) {
-				if ( key.match(/^lec[0-9]+_p[0-9]+$/) !== null ) {
+				if ( key.match(/^lec[0-9]+_p[0-9]+$/) !== null && key === key.match(/^lec[0-9]+_p[0-9]+$/)[0] ) {
 					elem = d3.select("#" + key);
 					elem.text(details[key] + "/" + elem.attr("value"));
 				}
 			}
+
+			// draw time on site chart
+			this.createTimeOnSiteGraph(ctrl.getVisits(), 840, 200);
+
 		}
 	};
 	ctrl.init();
