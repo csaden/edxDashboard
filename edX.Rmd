@@ -7,6 +7,7 @@ output: html_document
 ```{r echo=FALSE, Load_Data}
 library(ggplot2)
 library(dplyr)
+library(scales)
 theme_set(theme_minimal(16))
 
 problems <- read.csv("problems.csv", header=T,

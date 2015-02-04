@@ -64,7 +64,7 @@ function copyArray(array) {
 	return newArray;
 }
 
-function getCourseMap(detailsArray) {
+function getCourseNodes(detailsArray) {
 
 	var allNodes = [];
 
@@ -143,30 +143,6 @@ function drawBar(id, width, height, data, total) {
 		// to round corners of rectangles
 		// .attr("rx", radius)
 		// .attr("ry", radius)
-}
-
-function getMaxObjectValue(this_array, element) {
-    var values = [];
- 
-    for (var i = 0; i < this_array.length; i++) {
-        values.push(Math.ceil(parseFloat(this_array[i][""+element])));
-    }
- 
-    values.sort(function(a,b){return a-b;});
- 
-    return values[values.length-1];
-}
- 
-function getMinObjectValue(this_array, element) {
-    var values = [];
- 
-    for (var i = 0; i < this_array.length; i++) {
-        values.push(Math.floor(parseFloat(this_array[i][""+element])));
-    }
-    
-    values.sort(function(a,b){return a-b;});
- 
-    return values[0];
 }
 
 function formatTime(num) {

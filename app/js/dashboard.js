@@ -115,11 +115,13 @@ $(function() {
 						.key(function(d) { return d.subsection; })
 						.map(modelThis.problems);
 
-					var _allProblems = [];
+					var _allProblems = [],
+						lectures,
+						newObject;
 
 					for (var weekKey in modelThis.details) {
 						
-						var lectures = modelThis.details[weekKey];
+						lectures = modelThis.details[weekKey];
 
 						for (var lectureKey in lectures) {
 
@@ -144,11 +146,12 @@ $(function() {
 						.key(function(d) { return d.subsection; })
 						.map(modelThis.videos);
 
-					var _allVideos = [];
+					var _allVideos = [],
+						vidLectures;
 
 					for (var vidWeekKey in modelThis.videos) {
 						
-						var vidLectures = modelThis.videos[vidWeekKey];
+						vidLectures = modelThis.videos[vidWeekKey];
 
 						for (var vidLectureKey in vidLectures) {
 
@@ -165,12 +168,15 @@ $(function() {
 					}
 					modelThis.videos = _allVideos;
 
+					var thisWeek,
+						thisLecture;
+
 					// combine info from all problems and videos
 					// by week and lecture
 					for (var i = 0, l = modelThis.details.length; i < l; i++) {
 
-						var thisWeek = modelThis.details[i].week;
-						var thisLecture = modelThis.details[i].lecture;
+						thisWeek = modelThis.details[i].week;
+						thisLecture = modelThis.details[i].lecture;
 
 						if (thisWeek === modelThis.videos[i].week && thisLecture === modelThis.videos[i].lecture) {
 
@@ -205,7 +211,7 @@ $(function() {
 						}).entries(modelThis.videoViews);
 
 					// get problem and video ids to build course map
-					modelThis.courseMap = getCourseMap(modelThis.details);
+					modelThis.courseMap = getCourseNodes(modelThis.details);
 
 					// get and format lecture ids for details table
 					modelThis.details.forEach(function(elem) {
@@ -238,6 +244,9 @@ $(function() {
 		},
 		setCurrentStudent : function(studentId) {
 			model.currentStudent = +studentId;
+		},
+		getCourseMap : function() {
+			return modelThis.courseMap;
 		},
 		setPointsData : function(studentId) {
 			var problems = modelThis.problemAttempts.filter(function(element) {
@@ -404,13 +413,15 @@ $(function() {
 			this.createDropDown();
 			this.createDetailsTable();
 
-			drawBarContainer("#progress-points-bar", 150, 30);
-			drawBarContainer("#progress-video-time-bar", 150, 30);
-			drawBarContainer("#total-points-bar", 150, 30);
-			drawBarContainer("#total-video-time-bar", 150, 30);
+			drawBarContainer("#progress-points-bar", 140, 30);
+			drawBarContainer("#progress-video-time-bar", 140, 30);
+			drawBarContainer("#total-points-bar", 140, 30);
+			drawBarContainer("#total-video-time-bar", 140, 30);
 
-			drawBarContainer(".problem-bar", 150, 30);
-			drawBarContainer(".video-bar", 150, 30);
+			drawBarContainer(".problem-bar", 140, 30);
+			drawBarContainer(".video-bar", 140, 30);
+
+			this.createCourseMap();
 
 			$(":input[name='currentStudent']").on("change", function() {
 				ctrl.setCurrentStudent(this.value);
@@ -503,7 +514,7 @@ $(function() {
 		},
 		createTimeOnSiteGraph : function(records, wid, hgt) {
 
-			var margin = {top: 20, right: 0, bottom: 60, left: 60},
+			var margin = {top: 20, right: 0, bottom: 70, left: 70},
 				width = wid - margin.left - margin.right,
 				height = hgt - margin.top - margin.bottom;
 
@@ -517,17 +528,16 @@ $(function() {
 
 			// set the scales for the x and y axis
 			var x = d3.time.scale()
-					.domain(d3.extent(records, function(d) {
-						return d.date;
-					}))
-					// .domain(ctrl.getDateExtents())
-					.range([0, width]),
+					.domain(ctrl.getDateExtents())
+					.range([0, width]);
 				
-				y = d3.scale.linear()
-					.domain(d3.extent(records, function(d) {
-						return d.minutes_on_site;
-					}))
-					// .domain(ctrl.getTimeExtents())
+
+			var maxMins = d3.max(records, function(d) {
+				return d.minutes_on_site;
+			});
+
+			var y = d3.scale.linear()
+					.domain([0, maxMins >= ctrl.getMedian() ? maxMins : ctrl.getMedian()])
 					.range([height, 0]);
 
 			// draw xAxis
@@ -556,7 +566,8 @@ $(function() {
 				.orient("left");
 
 			var yAxisG = svg.append("g")
-				.attr("class", "y-axis");
+				.attr("class", "y-axis")
+				.attr("transform", "translate(-10, 0)");
 
 			yAxisG.transition()
 				.duration(1000)
@@ -564,7 +575,7 @@ $(function() {
 
 			yAxisG.append("text")
 				.attr("transform", "rotate(-90)")
-				.attr("x", -120)
+				.attr("x", -90)
 				.attr("y", -50)
 				.attr("dy", ".7em")
 				.attr("text-anchor", "end")
@@ -597,13 +608,13 @@ $(function() {
 				.attr("width", barWidth - 2)
 				.attr("height", 0)
 				.transition()
-				.duration(2000)
+				.duration(2500)
 				.attr("height", function(d) {
 					return height - y(d.minutes_on_site);
 				})
 				.attr("y", function(d) {
 					return y(d.minutes_on_site);
-				})
+				});
 
 			var medianLineData = [	{ "x" : 0, "y" : ctrl.getMedian() },
 									{ "x" : width, "y" : ctrl.getMedian() }];
@@ -615,7 +626,21 @@ $(function() {
 
 			svg.append("path")
 				.attr("class", "median")
-				.attr("d", createLine(medianLineData))
+				.attr("d", createLine(medianLineData));
+		},
+		createCourseMap : function() {
+			var mapNodes = ctrl.getCourseMap(),
+				frag = document.createDocumentFragment(),
+				node,
+				map;
+			for (var i=0, l=mapNodes.length; i <l; i++) {
+				node = document.createElement("div");
+				node.id = mapNodes[i] + "node";
+				node.className = "map-node";
+				frag.appendChild(node);
+			}
+			map = document.getElementById("map");
+			map.appendChild(frag);
 		},
 		render : function() {
 			
@@ -630,13 +655,13 @@ $(function() {
 				.remove();
 
 			// draw four main bars for work in progress and total progress
-			drawBar("#progress-points-bar", 150, 30, ctrl.getProgressPoints(), ctrl.getAttemptedPoints());
+			drawBar("#progress-points-bar", 140, 30, ctrl.getProgressPoints(), ctrl.getAttemptedPoints());
 			
-			drawBar("#progress-video-time-bar", 150, 30, ctrl.getProgressVideoTime(), ctrl.getAttemptedVideoTime());
+			drawBar("#progress-video-time-bar", 140, 30, ctrl.getProgressVideoTime(), ctrl.getAttemptedVideoTime());
 			
-			drawBar("#total-points-bar", 150, 30, ctrl.getProgressPoints(), ctrl.getPossiblePoints());
+			drawBar("#total-points-bar", 140, 30, ctrl.getProgressPoints(), ctrl.getPossiblePoints());
 			
-			drawBar("#total-video-time-bar", 150, 30, ctrl.getProgressVideoTime(), ctrl.getPossibleVideoTime());
+			drawBar("#total-video-time-bar", 140, 30, ctrl.getProgressVideoTime(), ctrl.getPossibleVideoTime());
 
 			// bind summary data to top two tables
 			d3.select("#daily-time").text("~" + ctrl.getAvgTimePerDay() + " min");
@@ -676,14 +701,14 @@ $(function() {
 				elem.text( o.lecture_points + " / " + elem.attr("value") );
 
 				// draw bar for points total by lecture
-				drawBar(lect + "-prob-bar", 150, 30, o.lecture_points, +elem.attr("value"));
+				drawBar(lect + "-prob-bar", 140, 30, o.lecture_points, +elem.attr("value"));
 
 				// bind video data to table
 				elem = d3.select(lect + "-videos");
 				elem.text( o.watched_seconds + " / " + elem.attr("value") );
 
 				// draw bar for video seconds watched by lecture
-				drawBar(lect + "-video-bar", 150, 30, o.watched_seconds, +elem.attr("value"));
+				drawBar(lect + "-video-bar", 140, 30, o.watched_seconds, +elem.attr("value"));
 
 			}
 
@@ -697,7 +722,7 @@ $(function() {
 			}
 
 			// draw time on site chart
-			this.createTimeOnSiteGraph(ctrl.getVisits(), 800, 300);
+			this.createTimeOnSiteGraph(ctrl.getVisits(), 1200, 300);
 
 		}
 	};

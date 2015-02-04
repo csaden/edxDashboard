@@ -38,12 +38,6 @@ img[title="Home Page"] {
 	/*color : #DE7DAE; 	light pink */
 }
 
-.ui.progress .bar {
-	width: 95%;
-	background: #71C3E8;
-	/*background: #00A0E3;*/
-}
-
 .ui.divider {
 	margin: 2% 0;
 }
@@ -184,21 +178,15 @@ img[title="Home Page"] {
 
 .problem-id {
 	color: dimgray;
-	font-size: .85em;
+	font-size: .9em;
 /*	color: #DE7DAE;*/
 /*	color: #71C3E8;*/
 /*	color: #8A8C8F;*/
 }
 
 .problem-total, .video-total {
-	/*color: black;*/
+	color: black;
 	font-size: 1.05em;
-	color: #B72667;  /*	dark pink */
-}
-
-.ui.tiny.progress .bar {
-	background: #71C3E8;
-	/*background: #00A0E3;*/
 }
 
 .percent {
@@ -216,8 +204,15 @@ img[title="Home Page"] {
 	display:block;
 }
 
+.map-node {
+	width: 20px;
+	height: 20px;
+	border: 1px solid dimgray;
+	float: left;
+}
+
 .axis {
-	font: 10px sans-serif;
+	font: 14px "Source Sans Pro";
 }
 
 path, line {
@@ -227,11 +222,12 @@ path, line {
 }
 
 text {
-	font-size: .6em;
+	font-size: .9em;
 }
 
 .median {
 	stroke: #B72667;
 	stroke-width: 2;
 	fill: #B72667;
+	shape-rendering: crispEdges;
 }
