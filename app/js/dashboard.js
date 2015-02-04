@@ -5,7 +5,7 @@ $(function() {
 		init: function() {
 			modelThis = this;
 
-			//current student data
+			// current student data
 			currentStudent = null;
 			modelThis.progressPoints = null;
 			modelThis.attemptedPoints = null;
@@ -33,7 +33,7 @@ $(function() {
 			modelThis.allProgress = null;
 			modelThis.allProgressByLecture = null;
 
-			//parsed data from munging csv files
+			// parsed data from munging csv files
 			modelThis.studentIds = [];
 			modelThis.lectures = [];
 			modelThis.details = null;
@@ -43,11 +43,9 @@ $(function() {
 			modelThis.dateExtents = null;
 			modelThis.timeExtents = null;
 
-			//values to compute
+			// values to compute
 			modelThis.possiblePoints = null;
 			modelThis.possibleVideoTime = null;
-
-			//need to compute this
 			modelThis.medianDailyVisit = null;
 
 			$( document ).ready(function() {
@@ -98,6 +96,11 @@ $(function() {
 					modelThis.studentIds = d3.set(modelThis.studentIds)
 						.values()
 						.map(Number);
+
+					// get median of the all students' median minutes on site
+					modelThis.medianDailyVisit = d3.median(modelThis.allProgress, function(d) {
+						return d.median_minutes_per_day;
+					});
 
 					// get max and min date for site visits
 					modelThis.dateExtents = d3.extent(modelThis.minutesPerDay, function(d) { return d.date; });
@@ -355,6 +358,9 @@ $(function() {
 		getDetails : function() {
 			return modelThis.details;
 		},
+		getMedian : function() {
+			return modelThis.medianDailyVisit;
+		},
 		getPointsPercentile : function() {
 			var percentile = d3.scale.quantile()
 				.domain(d3.extent(modelThis.allTotalPoints))
@@ -511,11 +517,17 @@ $(function() {
 
 			// set the scales for the x and y axis
 			var x = d3.time.scale()
-					.domain(ctrl.getDateExtents())
+					.domain(d3.extent(records, function(d) {
+						return d.date;
+					}))
+					// .domain(ctrl.getDateExtents())
 					.range([0, width]),
 				
 				y = d3.scale.linear()
-					.domain(ctrl.getTimeExtents())
+					.domain(d3.extent(records, function(d) {
+						return d.minutes_on_site;
+					}))
+					// .domain(ctrl.getTimeExtents())
 					.range([height, 0]);
 
 			// draw xAxis
@@ -552,7 +564,7 @@ $(function() {
 
 			yAxisG.append("text")
 				.attr("transform", "rotate(-90)")
-				.attr("x", -40)
+				.attr("x", -120)
 				.attr("y", -50)
 				.attr("dy", ".7em")
 				.attr("text-anchor", "end")
@@ -592,6 +604,18 @@ $(function() {
 				.attr("y", function(d) {
 					return y(d.minutes_on_site);
 				})
+
+			var medianLineData = [	{ "x" : 0, "y" : ctrl.getMedian() },
+									{ "x" : width, "y" : ctrl.getMedian() }];
+
+			var createLine = d3.svg.line()
+				.x(function(d) { return d.x;} )
+				.y(function(d) { return y(d.y);} )
+				.interpolate("linear");
+
+			svg.append("path")
+				.attr("class", "median")
+				.attr("d", createLine(medianLineData))
 		},
 		render : function() {
 			
@@ -673,7 +697,7 @@ $(function() {
 			}
 
 			// draw time on site chart
-			this.createTimeOnSiteGraph(ctrl.getVisits(), 840, 200);
+			this.createTimeOnSiteGraph(ctrl.getVisits(), 800, 300);
 
 		}
 	};

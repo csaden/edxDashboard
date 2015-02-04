@@ -229,3 +229,9 @@ path, line {
 text {
 	font-size: .6em;
 }
+
+.median {
+	stroke: #B72667;
+	stroke-width: 2;
+	fill: #B72667;
+}
