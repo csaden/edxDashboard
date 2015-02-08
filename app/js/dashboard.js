@@ -17,8 +17,9 @@ $(function() {
 			modelThis.pointsPercentile = null;
 			modelThis.videoTimePercentile = null;
 			modelThis.detailsProgress= null;
+			modelThis.accessedContent = null;
 
-			// add this information?
+			// add this information ???
 			modelThis.lastNode = null;
 
 			// original csv data
@@ -28,8 +29,7 @@ $(function() {
 			modelThis.videos = null;
 			modelThis.videoViews = null;
 
-			// data created from manipulating original csv data
-			// using R / RStudio
+			// data created from original csv data using R / RStudio
 			modelThis.allProgress = null;
 			modelThis.allProgressByLecture = null;
 
@@ -73,7 +73,7 @@ $(function() {
 					getData("data/all_progress.csv"),
 					getData("data/progress_by_lecture.csv")
 				
-				).done(function(a, b, c, d, e, f, g) {
+				).then(function(a, b, c, d, e, f, g) {
 
 					modelThis.problems = processData(a[0]);
 					modelThis.problemAttempts = processData(b[0]);
@@ -248,6 +248,25 @@ $(function() {
 		getCourseMap : function() {
 			return modelThis.courseMap;
 		},
+		setAccessedContent : function(studentId) {
+			var content = [],
+			problems = modelThis.problemAttempts.filter(function(element) {
+				return +element.student_id === +studentId;
+			}),
+			videos = modelThis.videoViews.filter(function(element) {
+				return +element.student === +studentId;
+			});
+			for (var i=0, l=problems.length; i<l; i++) {
+				content.push(problems[i].problem_id);
+			}
+			for (i=0, l=videos.length; i<l; i++) {
+				content.push(problems[i].video_id);
+			}
+			modelThis.accessedContent = content;
+		},
+		getAccessedContent : function() {
+			return modelThis.accessedContent;
+		},
 		setPointsData : function(studentId) {
 			var problems = modelThis.problemAttempts.filter(function(element) {
 				return +element.student_id === +studentId;
@@ -404,22 +423,29 @@ $(function() {
 			this.setAvgTimePerDay(studentId);
 			this.setProgressByLecture(studentId);
 			this.setDetailsProgress(studentId);
+			this.setAccessedContent(studentId);
 		}
 	};
 
 	var view = {
 		init : function() {
 
+			d3.select("#attendance-chart")
+				.append("svg")
+				.attr("class", "time-on-site-graph")
+				.attr("width", 1200)
+				.attr("height", 150);
+
 			this.createDropDown();
 			this.createDetailsTable();
 
-			drawBarContainer("#progress-points-bar", 140, 30);
-			drawBarContainer("#progress-video-time-bar", 140, 30);
-			drawBarContainer("#total-points-bar", 140, 30);
-			drawBarContainer("#total-video-time-bar", 140, 30);
+			drawBarContainer("#progress-points-bar", 100, 20);
+			drawBarContainer("#progress-video-time-bar", 100, 20);
+			drawBarContainer("#total-points-bar", 100, 20);
+			drawBarContainer("#total-video-time-bar", 100, 20);
 
-			drawBarContainer(".problem-bar", 140, 30);
-			drawBarContainer(".video-bar", 140, 30);
+			drawBarContainer(".problem-bar", 100, 20);
+			drawBarContainer(".video-bar", 100, 20);
 
 			this.createCourseMap();
 
@@ -427,6 +453,10 @@ $(function() {
 				ctrl.setCurrentStudent(this.value);
 				ctrl.updateStudentData(this.value);
 				view.render();
+			});
+
+			$('input').on('change', function(){
+				$('.long.arrow.right.pink').hide();
 			});
 		},
 		createDropDown : function() {
@@ -450,7 +480,7 @@ $(function() {
 
 			var data = ctrl.getDetails();
 
-			var weekRow = d3.select(".progress-details tbody")
+			var weekRow = d3.select(".details-table tbody")
 				.selectAll("tr.week-row")
 				.data(data)
 				.enter()
@@ -526,6 +556,26 @@ $(function() {
 				.append("g")
 				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+			var formatDate = d3.time.format("%x");
+
+			// create a tooltip
+			var tip = d3.tip()
+				.attr('class', 'd3-tip')
+				.offset([-10, 0])
+				.html(function(d) {
+					return "<span>Date:</span> <span style='color:#DE7DAE'>" + formatDate(new Date(d.date)) + "</span> <br> <span>Minutes:</span> <span style='color:#DE7DAE'>" + d.minutes_on_site + "</span>";
+				});
+
+			var median_tip = d3.tip()
+				.attr('class', 'd3-tip')
+				.offset([-10, 0])
+				.html(function(d) {
+					return "<span>Students who earned a certificate spent at least " + ctrl.getMedian() + " minutes working through videos and problems each time they visited the site.</span>";
+				});
+
+			svg.call(tip);
+			svg.call(median_tip);
+
 			// set the scales for the x and y axis
 			var x = d3.time.scale()
 					.domain(ctrl.getDateExtents())
@@ -551,13 +601,13 @@ $(function() {
 				.attr("transform", "translate(0," + height + ")");
 
 			xAxisG.transition()
-				.duration(1000)
+				.duration(500)
 				.call(xAxis);
 
 			xAxisG.selectAll("text")
-				.attr("transform", "rotate(-45)")
-				.attr("dy", ".5em")
-				.attr("dx", "-.7em")
+				.attr("transform", "rotate(-30)")
+				.attr("dx", "-.3em")
+				.attr("dy", ".9em")
 				.style("text-anchor", "end");
 
 			// draw yAxis
@@ -570,7 +620,7 @@ $(function() {
 				.attr("transform", "translate(-10, 0)");
 
 			yAxisG.transition()
-				.duration(1000)
+				.duration(500)
 				.call(yAxis);
 
 			yAxisG.append("text")
@@ -588,7 +638,7 @@ $(function() {
 
 			d3.selectAll(".attendance-bars")
 				.transition()
-				.duration(500)
+				.duration(250)
 				.attr("y", height)
 				.attr("height", 0)
 				.remove();
@@ -596,9 +646,9 @@ $(function() {
 			var bars = svg.selectAll("rect")
 				.data(records)
 				.enter()
-				.append("rect")
+				.append("svg:rect")
 				.attr("class", "attendance-bars")
-				.style("fill", "#71C3E8")
+				.attr("fill", "#71C3E8")
 				.attr("x", function(d) {
 					return x(d.date);
 				})
@@ -607,8 +657,11 @@ $(function() {
 				})
 				.attr("width", barWidth - 2)
 				.attr("height", 0)
-				.transition()
-				.duration(2500)
+				.on("mouseover", tip.show)
+				.on("mouseout", tip.hide);
+
+			bars.transition()
+				.duration(1500)
 				.attr("height", function(d) {
 					return height - y(d.minutes_on_site);
 				})
@@ -626,28 +679,67 @@ $(function() {
 
 			svg.append("path")
 				.attr("class", "median")
-				.attr("d", createLine(medianLineData));
+				.attr("d", createLine(medianLineData))
+				.on("mouseover", median_tip.show)
+				.on("mouseout", median_tip.hide);
 		},
 		createCourseMap : function() {
-			var mapNodes = ctrl.getCourseMap(),
+			var mapNodes = copyArray(ctrl.getCourseMap()),
 				frag = document.createDocumentFragment(),
-				node,
-				map;
-			for (var i=0, l=mapNodes.length; i <l; i++) {
-				node = document.createElement("div");
-				node.id = mapNodes[i] + "node";
-				node.className = "map-node";
-				frag.appendChild(node);
+				lectures = [],
+				lectNode,
+				row,
+				elem;
+			
+			for (var i=1, l=ctrl.getLectures().length; i<=l; i++) {
+				lectures.push("lec" + i);
 			}
-			map = document.getElementById("map");
-			map.appendChild(frag);
+
+			for (i=0; i<l; i++) {
+				
+				row = document.createElement("div");
+				row.className = 'map-row';
+				row.setAttribute("data-lect", lectures.shift());
+
+				lectNode = document.createElement("div");
+				lectNode.className = "map-lect";
+				lectNode.innerHTML = "Lecture " + (i+1);
+
+				row.appendChild(lectNode);
+				
+				while (mapNodes.length > 0) {
+							
+					if (mapNodes[0].indexOf(row.getAttribute("data-lect")) > -1) {
+						elem = document.createElement("div");
+						elem.className = "map-node";
+						elem.setAttribute("data-id", mapNodes.shift());
+						row.appendChild(elem);
+					}
+					else {
+						break;
+					}
+				}
+				frag.appendChild(row);
+			}
+			document.getElementById("map").appendChild(frag);
+		},
+		colorCourseMap : function() {
+
+			d3.selectAll(".accessed-node")
+				.attr("class", "map-node");
+
+			var content = ctrl.getAccessedContent();
+			for (var i=0, l=content.length; i<l; i++) {
+				d3.select(".map-node[data-id=" + content[i] + "]")
+					.attr("class", "map-node accessed-node");
+			}
 		},
 		render : function() {
 			
 			// remove current data .inner-rect from the page
 			d3.selectAll(".inner-rect")
 				.transition()
-				.duration(500)
+				.duration(250)
 				.attr("width", 0)
 				.remove();
 
@@ -655,34 +747,43 @@ $(function() {
 				.remove();
 
 			// draw four main bars for work in progress and total progress
-			drawBar("#progress-points-bar", 140, 30, ctrl.getProgressPoints(), ctrl.getAttemptedPoints());
+			drawBar("#progress-points-bar", 100, 20, ctrl.getProgressPoints(), ctrl.getAttemptedPoints());
 			
-			drawBar("#progress-video-time-bar", 140, 30, ctrl.getProgressVideoTime(), ctrl.getAttemptedVideoTime());
+			drawBar("#progress-video-time-bar", 100, 20, ctrl.getProgressVideoTime(), ctrl.getAttemptedVideoTime());
 			
-			drawBar("#total-points-bar", 140, 30, ctrl.getProgressPoints(), ctrl.getPossiblePoints());
+			drawBar("#total-points-bar", 100, 20, ctrl.getProgressPoints(), ctrl.getPossiblePoints());
 			
-			drawBar("#total-video-time-bar", 140, 30, ctrl.getProgressVideoTime(), ctrl.getPossibleVideoTime());
+			drawBar("#total-video-time-bar", 100, 20, ctrl.getProgressVideoTime(), ctrl.getPossibleVideoTime());
 
 			// bind summary data to top two tables
 			d3.select("#daily-time").text("~" + ctrl.getAvgTimePerDay() + " min");
 			
 			d3.select("#progress-points").text(ctrl.getProgressPoints() + " / " + ctrl.getAttemptedPoints());
+
+			d3.select("#progress-points-percent").text(Math.floor(safeDivide(+ctrl.getProgressPoints(), +ctrl.getAttemptedPoints()) * 100) + "%");
 			
 			d3.select("#progress-video-time").text(formatTime(ctrl.getProgressVideoTime()));
 
-			d3.select("#total-attempted-time").text(formatTime(ctrl.getAttemptedVideoTime()));
+			d3.select("#progress-attempted-time").text(formatTime(ctrl.getAttemptedVideoTime()));
+
+			d3.select("#progress-video-time-percent").text(Math.floor(safeDivide(+ctrl.getProgressVideoTime(), +ctrl.getAttemptedVideoTime()) * 100) + "%");
 			
 			d3.select("#total-points").text(ctrl.getProgressPoints() + " / " + ctrl.getPossiblePoints());
+
+			d3.select("#total-points-percentile").text(Math.floor(
+				safeDivide(+ctrl.getProgressPoints(), +ctrl.getPossiblePoints()) * 100) + "%");
 			
 			d3.select("#total-video-time").text(formatTime(ctrl.getProgressVideoTime()));
+
+			d3.select("#total-video-time-percentile").text(Math.floor(safeDivide(+ctrl.getProgressVideoTime(), +ctrl.getPossibleVideoTime()) *100) + "%");
 
 			d3.select("#total-possible-time").text(formatTime(ctrl.getPossibleVideoTime()));
 			
 			d3.select("#current-grade").text(ctrl.getCurrentGrade());
 
-			d3.select("#points-percentile").text(ctrl.getPointsPercentile() + "%");
+			d3.select("#points-class-percentile").text(ctrl.getPointsPercentile() + "%");
 
-			d3.select("#video-time-percentile").text(ctrl.getVideoTimePercentile() + "%");
+			d3.select("#video-time-class-percentile").text(ctrl.getVideoTimePercentile() + "%");
 
 			// bind progressByLecture data to the details table
 			var lectureData, // student progress by lecture
@@ -701,14 +802,14 @@ $(function() {
 				elem.text( o.lecture_points + " / " + elem.attr("value") );
 
 				// draw bar for points total by lecture
-				drawBar(lect + "-prob-bar", 140, 30, o.lecture_points, +elem.attr("value"));
+				drawBar(lect + "-prob-bar", 100, 20, o.lecture_points, +elem.attr("value"));
 
 				// bind video data to table
 				elem = d3.select(lect + "-videos");
 				elem.text( o.watched_seconds + " / " + elem.attr("value") );
 
 				// draw bar for video seconds watched by lecture
-				drawBar(lect + "-video-bar", 140, 30, o.watched_seconds, +elem.attr("value"));
+				drawBar(lect + "-video-bar", 100, 20, o.watched_seconds, +elem.attr("value"));
 
 			}
 
@@ -724,6 +825,7 @@ $(function() {
 			// draw time on site chart
 			this.createTimeOnSiteGraph(ctrl.getVisits(), 1200, 300);
 
+			this.colorCourseMap();
 		}
 	};
 	ctrl.init();

@@ -1,0 +1,49 @@
+@media only screen and (min-width:1250px) {
+	
+	/* Nav Bar */
+	.nav-mobile {
+		display: none;
+		visibility: hidden;
+	}
+
+	.dropdown {
+		width: 35%;
+		margin: 1 0%;
+	}
+
+	/* Main Summary Tables */
+
+	.progress-container, .summary-container {
+		margin: 1% 0;
+		width: 40%;
+	}
+
+	.progress-row, .summary-row {
+		display: block;
+		margin: 1% 0;
+	}
+
+	.stat-title {
+		width: 35%;
+	}
+	.stat-data {
+		width: 15%;
+	}
+	.stat-percentile {
+		width: 10%;
+		padding-left: 1.5%;
+	}
+	.stat-bar {
+		width: 20%;
+		vertical-align: middle;
+	}
+	.class-percentile {
+		width: 15%;
+		text-align: center;
+	}
+
+	.attendance-container {
+		width: 100%;
+		clear: both;
+	}
+}

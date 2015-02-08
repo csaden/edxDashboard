@@ -6,8 +6,11 @@
 	
 	<link href="bower_components/semantic-ui/dist/semantic.min.css" rel="stylesheet" type="text/css" ></link>
 <!-- https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.8.1/semantic.min.css -->
-	<link href="css/dashboard.css" rel="stylesheet" type="text/css"></link>
-	<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro' rel='stylesheet' type="text/css">
+	<link href="css/dashboard.css" rel="stylesheet"></link>
+	<link href="css/max-750px.css" media="(max-width:750px)" rel="stylesheet"></link>
+	<link href="css/min-751px.css" media="(max-width:1249px)" rel="stylesheet"></link>
+	<link href="css/min-1250px.css" media="(min-width:1250px)" rel="stylesheet"></link>
+	<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro' rel='stylesheet'>
 <!-- 	<link rel="stylesheet" type="text/css" href="css/media_query_reporter.css"> -->
 
 <!-- CDN LINKS FOR JS LIBRARIES -->
@@ -15,215 +18,140 @@
 <!-- https://code.jquery.com/jquery-2.1.3.min.js -->
 <!-- https://code.jquery.com/jquery-1.11.2.min.js -->
 <!-- https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.8.1/semantic.min.js -->
-	<script src='bower_components/knockout/dist/knockout.js'></script>
 	<script src="bower_components/jquery/dist/jquery.min.js"></script>
 	<script src="bower_components/semantic-ui/dist/semantic.min.js"></script>
 	<script src="bower_components/d3/d3.min.js"></script>
+	<script src="bower_components/d3-tip/index.js"></script>
 	<script src="js/helper.js"></script>
 	<script src="js/dashboard.js"></script>
 </head>
 <body>
-<div class="page grid">
-<div class="ui grid">
-	<div class="computer tablet only row">
-		<div id="nav" class="ui menu navbar">
-			<a class="brand item edx-home-image">
-				<img href="https://edx.org" title="Home Page" src="img/edx-logo-77x36.png">
-			</a>
-			<a class="item">Courseware</a>
-			<a class="item">Updates & News</a>
-			<a class="item">Calendar</a>
-			<a class="item">Wiki</a>
-			<a class="item">Discussion</a>
-			<a class="item active">Progress</a>
-		</div>
-	</div>
-	<div class="mobile only narrow row">
-		<div class="ui menu navbar">
-			<a class="brand item">
-				<img href="https://edx.org" title="Home Page" src="/img/edx-logo-77x36.png" alt="edX">
-			</a>
-			<div class="right menu open">
-				<a href class="menu item">
-					<i class="content icon"></i>
-				</a>
+	<script type="text/javascript" src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+
+	<nav class="nav-bar">
+		<a class="edx-home-image">
+			<img href="https://edx.org" title="Home Page" src="img/edx-logo-77x36.png">
+		</a>
+		<a class="item">Courseware</a>
+		<a class="item">Updates & News</a>
+		<a class="item">Calendar</a>
+		<a class="item">Wiki</a>
+		<a class="item">Discussion</a>
+		<a class="item active">Progress</a>
+	</nav>
+	
+	<nav class="nav-mobile">
+		<a class="edx-home-image">
+			<img href="https://edx.org" title="Home Page" src="img/edx-logo-77x36.png">
+		</a>
+		<a "menu-mobile"><i class="large content icon"></i></a>
+	</nav>
+
+	<div class="main-container">
+
+		<div class="course-name"><h1>MITx: 6.00.1x Introduction to Computer Science and Programming Using Python</h1></div>
+
+		<div id="student-dropdown" class="student-dropdown">
+			<i class="icon large long arrow right pink"></i>
+			<div class="ui search selection dropdown">
+				<input type="hidden" name="currentStudent"></input>
+				<i class="dropdown icon"></i>
+				<div class="select-student default text">Enter a student id number or select a student...</div>
+				<div id="students" class="menu"></div>
 			</div>
-			<div class="ui vertical navbar menu" style="display: none;">
-				<a class="item">Courseware</a>
-				<a class="item">Updates & News</a>
-				<a class="item">Calendar</a>
-				<a class="item">Wiki</a>
-				<a class="item">Discussion</a>
-				<a class="item active">Progress</a>
-			</div>
 		</div>
-	</div>
-</div>
 
-<div class="main ui stackable grid">
-
-	<div class="ui three column stackable grid">
-
-		<div class="two wide column column-addon left floated">
-			<div id="student-dropdown">	
-				<div class="ui search selection dropdown">
-					<input type="hidden" name="currentStudent"></input>
-					<i class="dropdown icon"></i>
-					<div class="default text">Select a student...</div>
-					<div id="students" class="menu"></div>
+		<div class="goals-form">
+			<form id="goals" class="goals">
+				<div class="goal">
+					<label for="certificate">Would you like to try to earn a certificate in this course?</label>
+					<input name="certificate" type="checkbox">
 				</div>
+			</form>
+		</div>
+
+		<div class="progress-container">
+			<div class="look">Your Current Progress</div>
+			<div class="progress-row">
+				<div class="stat-title">Average Daily Visit</div>
+				<div id="daily-time" class="stat-data"></div>
+			</div>
+			<div class="progress-row">
+				<div class="stat-title">Points Attempted</div>
+				<div id="progress-points" class="stat-data"></div>
+				<div id="progress-points-percent" class="stat-percentile"></div>
+				<div id="progress-points-bar" class="stat-bar"></div>
+			</div>
+			<div class="progress-row">
+				<div class="stat-title">Video Time Watched</div>
+				<div id="progress-video-time" class="stat-data time"></div>
+				<div id="progress-video-time-percent" class="stat-percentile"></div>
+				<div id="progress-video-time-bar" class="stat-bar"></div>
+			</div>
+			<div class="progress-row">
+				<div class="stat-title">Time of Accessed Videos</div>
+				<div id="progress-attempted-time" class="stat-data time"></div>
+			</div>
+
+		</div>
+
+		<div class="summary-container">
+			<div class="look all-progress">All Course Progress</div>
+			<div class="week-note">8 of 8 Weeks Released</div>
+			<div class="summary-row">
+				<div class="stat-title">Current Grade</div>
+				<div id="current-grade" class="stat-data"></div>
+				<div class="stat-percentile"></div>
+				<div class="stat-bar"></div>
+				<div class="class-percentile">Percentile</div>
+			</div>
+			<div class="summary-row">
+				<div class="stat-title">All Points</div>
+				<div id="total-points" class="stat-data time"></div>
+				<div id="total-points-percentile" class="stat-percentile"></div>
+				<div id="total-points-bar" class="stat-bar"></div>
+				<div id="points-class-percentile" class="class-percentile"></div>
+			</div>
+			<div class="summary-row">
+				<div class="stat-title">Video Time Watched</div>
+				<div id="total-video-time" class="stat-data time"></div>
+				<div id="total-video-time-percentile" class="stat-percentile"></div>
+				<div id="total-video-time-bar" class="stat-bar"></div>
+				<div id="video-time-class-percentile" class="class-percentile"></div>
+			</div>
+			<div class="progress-row">
+				<div class="stat-title">Time of All Videos</div>
+				<div id="total-possible-time" class="stat-data time"></div>
 			</div>
 		</div>
 
-		<div class="six wide column column-addon left floated">
-			<table class="progress-stats">
+		<div class="attendance-container">
+			<div class="attendance look">Daily Time on Site</div>
+			<div id="attendance-chart"></div>
+		</div>
+
+		<div class="details-container">
+			<table class="details-table" class="look">
 				<thead>
 					<tr>
-						<th class="progress-names"></th>
-						<th class="progress-num"></th>
-						<th class="progress-bar"></th>
+						<th class="detail-week look">Progress Details</th>
+						<th class="detail-lecture"></th>
+						<th class="detail-score">Total Score</th>
+						<th class="detail-problem-bar"></th>
+						<th class="detail-problems">Problem Scores</th>
+						<th class="detail-video-time">Total Video Seconds Watched</th>
+						<th class="detail-video-bar"></th>
 					</tr>
 				</thead>
-				<tbody>
-					<tr>
-						<td class="look stat-title">Work in Progress</td>
-						<td></td>
-						<td></td>
-					</tr>
-					<tr>
-						<td class="stat-title">Average Daily Visit</td>
-						<td id="daily-time" class="stat-data"></td>
-						<td></td>
-					</tr>
-					<tr>
-						<td class="stat-title">Points Attempted</td>
-						<td id="progress-points"class="stat-data"></td>
-						<td id="progress-points-bar"></td>
-					</tr>
-					<tr>
-						<td class="stat-title">Time Watching Videos</td>
-						<td id="progress-video-time" class="stat-data time"></td>
-						<td id="progress-video-time-bar"></td>
-					</tr>
-					<tr>
-						<td class="stat-title">Time of Videos Accessed</td>
-						<td id="total-attempted-time" class="stat-data time"></td>
-						<td></td>
-					</tr>
-				</tbody>
-<!-- Might add this information in later-->
-<!--					<tr>
-					<td class="stat">Last Video Watched</td>
-					<td id="last-video"></td>
-					<td></td>
-					<td></td>
-				</tr>
-				<tr>
-					<td class="stat">Last Problem Attempted</td>
-					<td id="last-problem"></td>
-					<td></td>
-					<td></td>
-				</tr> -->
+				<tbody></tbody>
 			</table>
 		</div>
 
-		<div class="eight wide column column-addon left floated">
-			<table class="summary-stats">
-				<thead>
-					<tr>
-						<th class="stat-names"></th>
-						<th class="stat-num"></th>
-						<th class="stat-bar"></th>
-						<th class="stat-percentile"></th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td class="look stat-title">Total Progress</td>
-						<td></td>
-						<td class="term-note">100% of class released</td>
-						<td></td>
-					</tr>
-					<tr>
-						<td class="stat-title">Current Grade</td>
-						<td id="current-grade" class="stat-data"></td>
-						<td></td>   
-						<td class="stat-percentile">Percentile</td>
-					</tr>
-					<tr>
-						<td class="stat-title">Points Overall</td>
-						<td id="total-points" class="stat-data"></td>
-						<td id="total-points-bar"></td>
-						<td id="points-percentile" class="percentile"></td>
-					</tr>
-					<tr>
-						<td class="stat-title">Time Watching Videos</td>
-						<td id="total-video-time" class="stat-data time"></td>
-						<td id="total-video-time-bar"></td>
-						<td id="video-time-percentile" class="percentile"></td>
-					</tr>
-					<tr>
-						<td class="stat-title">Total Time of Videos</td>
-						<td id="total-possible-time" class="stat-data time"></td>
-						<td></td>
-						<td></td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
-	</div>
-</div>
-
-<div class="ui divider"></div>
-
-<div class="main ui stackable grid">
-	<div class="sixteen wide column">
-		<div id="attendance" class="look">Daily Time on Site</div>
-		<div id="attendance-chart"></div>
-	</div>
-</div>
-
-<div class="main ui stackable grid">
-	<div class="main ui two column stackable grid">		
-		<div class="eight wide column column-addon left floated">
-			<div id="call-to-action">
-				<div class="look">What Should I do next?</div>
-				<div>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.</div>
-			</div>
-		</div>
-		<div class="eight wide column column-addon left floated">
-			<div id="grade-distribution" class="look">Grade Distribution/Other Data?</div>
-		</div>
-	</div>
-</div>
-<div class="ui divider"></div>
-<div class="main ui stackable grid">
-	<div class="sixteen column wide computer tablet only">
 		<div class="map-container">
-			<div class="look">Course Map</div>
+			<div class="look course-map">Course Map</div>
 			<div id="map" class="map"></div>
 		</div>
+
 	</div>
-</div>
-<div class="ui divider"></div>
-<div class="main ui stackable grid">
-	<div class="ui one column stackable grid">
-		<table class="progress-details" class="look">
-			<thead>
-				<tr>
-					<th class="detail-week look">Progress Details</th>
-					<th class="detail-lecture"></th>
-					<th class="detail-score">Total Score</th>
-					<th class="detail-problem-bar"></th>
-					<th class="detail-problems">Problem Scores</th>
-					<th class="detail-video-time">Total Video Seconds Watched</th>
-					<th class="detail-video-bar"></th>
-				</tr>
-			</thead>
-			<tbody></tbody>
-		</table>
-	</div>
-</div>
-</div>
 </body>
 </html>

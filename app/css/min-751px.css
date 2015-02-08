@@ -1,0 +1,9 @@
+@media only screen and (max-width:1249px) {
+	
+	/* Nav Bar */
+	.nav-mobile {
+		display: none;
+		visibility: hidden;
+	}
+
+}

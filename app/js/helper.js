@@ -119,6 +119,15 @@ function drawBarContainer(selector, width, height) {
 
 }
 
+/* Source: https://gist.github.com/ESeufert/3418633 */
+
+function safeDivide(num1, num2) {
+	if ( isNaN(parseFloat(num2)) || isNaN(parseFloat(num1)) || num2 === 0 ) {
+		return 0;
+	}
+	return Math.round( parseFloat(num1) / parseFloat(num2) * 100 ) / 100;
+}
+
 function drawBar(id, width, height, data, total) {
 
 
@@ -135,8 +144,8 @@ function drawBar(id, width, height, data, total) {
 		.attr("height", height-2)
 		.attr("width", 0)
 		.transition()
-		.duration(2000)
-		.delay(500)
+		.duration(1000)
+		.delay(250)
 		.attr("x", 0)
 		.attr("width", length(data));
 

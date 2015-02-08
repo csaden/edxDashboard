@@ -142,6 +142,10 @@ qplot(total_score, data=problemProgress, geom="histogram")
 summary(videoProgress$total_seconds)
 summary(minutesProgress$total_minutes_on_site)
 summary(problemProgress$total_score)
+
+quantile(videoProgress$total_seconds)
+quantile(minutesProgress$total_minutes_on_site)
+quantile(problemProgress$total_score)
 ```
 
 

@@ -1,117 +1,123 @@
-body {
-	font: "Source Sans Pro" Helvetica Arial sans-serif;
+body, html {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	font-family: "Open Sans", Verdana, Geneva, sans-serif;
 	background: white;
 	color: #333;
 }
 
-img[title="Home Page"] {
-	width: 64px;
-	height: 30px;
+body {
+	font-family: "Open Sans", Verdana, Geneva, sans-serif;
+	font-size: 14px;
+	background: white;
+	color: #333;
 }
 
-.main.stackable {
-	margin: 0 .2%;
+div {
+	box-sizing: border-box;
 }
 
-.ui.grid>.column:not(.row) {
-	padding-top: .5rem;
-	padding-bottom: .5rem;
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
 }
 
-.term-note {
-	text-align: left;
-	font-style: italic;
-	color: #999;
-	font-size: 1em;
+a {
+  padding: 1.2em;
+  color: inherit;
 }
 
-.stat-percentile, .percentile {
-	text-align: center;
-	font-size: 1em;
-	padding: 0 0 0 .5%;
+/*
+*
+* Navigation
+*
+*/
+
+nav {
+	box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+	height: auto;
+	padding: 1% 0 1.1% 0;
+	border-bottom: 1px solid #aaa;
+	background: #fff;
+	z-index: 10;
 }
 
-.percentile {
-	font-size: 1.05em;
-	color: #B72667;  /*	dark pink */
-	/*color: #00A0E3; 	dark blue*/
-	/*color : #DE7DAE; 	light pink */
-}
-
-.ui.divider {
-	margin: 2% 0;
-}
-
-.progress-stats, .summary-stats, .progress-details {
-	table-layout: fixed;
-	width: 100%;
-	white-space: nowrap;
-}
-
-.progress-stats td, .summary-stats td, .progress-details td {
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	height: 30px;
-}
-
-.progress-details {
-	margin-left: 1em;
-}
-
-.progress-details th {
-	padding-bottom: .2em;
-}
-
-.progress-details td {
-	padding: 1em .5em 1em .5em;
-	text-align: left;
-}
-
-.progress-details th {
-	text-align: left;
-}
-
-.progress-stat {
-	width: 45%;
-}
-
-.progress-num {
- 	width: 20%;
-}
-
-.progress-bar {
-	width: 30%;
-}
-
-.stat-name {
-	width: 40%;
-}
-
-.stat-num {
-	width: 17%;
-}
-
-.stat-bar {
-	width: 30%;
-}
-
-.stat-percentile {
-	width: 13%;
-}
-
-.ui .progress:last-child {
-	margin: 1%;
+.active.item {
+	background: rgba(0,0,0,.03);
+	color: rgba(0,0,0,.8);
+	font-weight: 400;
+	box-shadow: 0 2px 0 inset;
 }
 
 .edx-home-image {
 	margin-left: .25%;
 }
 
-.stat-title, .stat-data {
+
+img[title="Home Page"] {
+	width: 64px;
+	height: 30px;
+}
+
+/*
+*
+* Main Content
+*
+*/
+.main-container {
+	margin: 0 2%;
+	width: 96%
+}
+
+h1 {
+  font-size: 1em;
+  color: #333;
+  margin-bottom: 1%;
+  padding: 0;
+}
+
+.icon .long .arrow {
+	float: left;
+}
+
+/*
+*
+* Progress and Summary Displays
+*
+*/
+
+.progress-container, .summary-container, .attendance-container {
 	padding: 1%;
-	font-size: 1.1em;
-	color: #333;
+	border: 1px solid #ccc;
+	-webkit-border-radius: 20px;
+	-moz-border-radius: 20px;
+	border-radius: 20px;
+}
+
+.inner-rect:hover {
+	fill: #DE7DAE;
+}
+
+.all-progress {
+	display: inline-block;
+}
+
+.week-note {
+	width: 50%;
+	font-style: italic;
+	font-size: .9em;
+	color: darkgray;
+	display: inline-block;
+	padding-left: 2%;
+	text-align: center;
+}
+
+.stat-title, .stat-data, .stat-percentile, .stat-bar, .class-percentile {
+	display: inline-block;
 }
 
 .stat-title {
@@ -119,10 +125,136 @@ img[title="Home Page"] {
 }
 
 .stat-data {
-	padding-left: 2%;
-	padding-right: 2%;
-	text-align: center;
 	color: black;
+	padding-left: 1.5%;
+}
+
+.perncetile {
+	float: right;
+}
+
+.class-percentile {
+	color: #B72667;
+	opacity: .8;
+}
+	/*color: #B72667;  	dark pink */
+	/*color: #00A0E3; 	dark blue */
+	/*color : #DE7DAE; 	light pink */
+
+/*
+*
+* Attendance Bar Graph
+*
+*/
+
+path, line {
+	fill: none;
+	stroke: #000;
+	shape-rendering: crispEdges;
+}
+
+text {
+	font-size: .9em;
+}
+
+.median {
+	stroke: #B72667;
+	stroke-width: 2;
+	fill: #B72667;
+	shape-rendering: crispEdges;
+	opacity: .5;
+}
+
+.attendance-bars:hover {
+	fill: #DE7DAE;
+}
+
+/* Source: http://bl.ocks.org/Caged/6476579 */
+
+.d3-tip {
+  line-height: 1;
+  font-weight: normal;
+  padding: 12px;
+  background: #333;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.7);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+
+/*
+*
+* Course Map
+*
+*/
+
+.course-map {
+	text-align: center;
+}
+
+.map-container {
+	margin: 2% 0;
+}
+
+.map-row {
+	margin: 1% 0;
+	display: block;
+}
+
+.map-lect {
+	display: inline-block;
+	width: 100px;
+	text-align: left;
+	font-size: 1.1em;
+	position: relative;
+	top: 50%;
+  	transform: translateY(-50%);
+}
+
+.map-node {
+	background-color: #F2F2F2;
+	height: 30px;
+	width: 30px;
+	display: inline-block;
+	border: 1px solid #333;
+	border: 1px solid rgba(0, 0, 0, .5);
+/*	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;*/
+}
+
+.accessed-node {
+	background-color: #71C3E8;
+}
+
+/*
+*
+* Progress Details Table
+*
+*/
+
+.details-container {
+	margin: 2% 0;
+	overflow-x: auto;
 }
 
 .week-row {
@@ -131,14 +263,12 @@ img[title="Home Page"] {
 	font-weight: normal;
 }
 
-.week-row:nth-child(2n) {
-	width: 100%;
-	background: white;
+.week-row:nth-child(2n+1) {
+	background: #F2F2F2;
 }
 
-.week-row:nth-child(2n+1) {
-	width: 100%;
-	background: #F2F2F2;
+.details-table tr th{
+	font-weight: normal;
 }
 
 .detail-week {
@@ -179,9 +309,11 @@ img[title="Home Page"] {
 .problem-id {
 	color: dimgray;
 	font-size: .9em;
-/*	color: #DE7DAE;*/
-/*	color: #71C3E8;*/
-/*	color: #8A8C8F;*/
+}
+
+.detail-problems, .detail-score, .detail-video-time {
+	color: #333;
+	font-size: 1.1em;
 }
 
 .problem-total, .video-total {
@@ -194,40 +326,30 @@ img[title="Home Page"] {
 	padding-left: 10%;
 }
 
-.look {
-	font-weight: bold;
-	font-size: 1.3em;
-	color: #545454;
-}
-.map {
+.goals {
+	display: none;
 	width: 100%;
-	display:block;
 }
 
-.map-node {
-	width: 20px;
-	height: 20px;
-	border: 1px solid dimgray;
-	float: left;
+.goal {
+	text-align: left;
+	margin: 1% 0;
+	font-size: 1.2em;
 }
 
-.axis {
-	font: 14px "Source Sans Pro";
+input[type=number] {
+	max-width: 50px;
+	min-height: 40px;
 }
 
-path, line {
-	fill: none;
-	stroke: #000;
-	shape-rendering: crispEdges;
-}
 
-text {
-	font-size: .9em;
-}
+/*
+*
+* Main Table Headings
+*
+*/
 
-.median {
-	stroke: #B72667;
-	stroke-width: 2;
-	fill: #B72667;
-	shape-rendering: crispEdges;
+.look {
+	font-size: 1.4em;
+	color: #646464;
 }
