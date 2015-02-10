@@ -47,6 +47,7 @@ $(function() {
 			modelThis.possiblePoints = null;
 			modelThis.possibleVideoTime = null;
 			modelThis.medianDailyVisit = null;
+			modelThis.avgCertTime = null;
 
 			$( document ).ready(function() {
 
@@ -101,6 +102,17 @@ $(function() {
 					modelThis.medianDailyVisit = d3.median(modelThis.allProgress, function(d) {
 						return d.median_minutes_per_day;
 					});
+
+					// get avg minutes on site for certificate earners
+					// assuming total score of 55%
+					modelThis.avgCertTime = modelThis.allProgress.filter(function(d) {
+						return d.total_score >= 55;
+					});
+					modelThis.avgCertTime = Math.round(d3.sum(modelThis.avgCertTime, function(d) {
+						return d.total_minutes_on_site;
+					}) / d3.sum(modelThis.avgCertTime, function(d) {
+						return d.n;
+					}));
 
 					// get max and min date for site visits
 					modelThis.dateExtents = d3.extent(modelThis.minutesPerDay, function(d) { return d.date; });
@@ -389,6 +401,9 @@ $(function() {
 		getMedian : function() {
 			return modelThis.medianDailyVisit;
 		},
+		getAvgCertTime : function() {
+			return modelThis.avgCertTime;
+		},
 		getPointsPercentile : function() {
 			var percentile = d3.scale.quantile()
 				.domain(d3.extent(modelThis.allTotalPoints))
@@ -437,17 +452,15 @@ $(function() {
 				.attr("height", 150);
 
 			this.createDropDown();
-			this.createDetailsTable();
+			this.createLectureTable();
 
 			drawBarContainer("#progress-points-bar", 100, 20);
 			drawBarContainer("#progress-video-time-bar", 100, 20);
 			drawBarContainer("#total-points-bar", 100, 20);
 			drawBarContainer("#total-video-time-bar", 100, 20);
 
-			drawBarContainer(".problem-bar", 100, 20);
-			drawBarContainer(".video-bar", 100, 20);
-
-			this.createCourseMap();
+			drawBarContainer(".lect-problem-bar", 100, 20);
+			drawBarContainer(".lect-video-bar", 100, 20);
 
 			$(":input[name='currentStudent']").on("change", function() {
 				ctrl.setCurrentStudent(this.value);
@@ -479,35 +492,6 @@ $(function() {
 		createDetailsTable : function() {
 
 			var data = ctrl.getDetails();
-
-			var weekRow = d3.select(".details-table tbody")
-				.selectAll("tr.week-row")
-				.data(data)
-				.enter()
-				.append("tr")
-				.attr("class", "week-row");
-
-			weekRow.append("td")
-				.attr("class", "week")
-				.text(function(d) { return d.week; });
-
-			weekRow.append("td")
-				.attr("class", "lecture")
-				.text(function(d) { return d.lecture; });
-
-			weekRow.append("td")
-				.attr("class", "problem-total")
-				.attr("value", function(d) { return +d.max_total_points; })
-				.attr("id", function(d) {
-					return d.lecture.replace(/\s+/g, '-') + "-problems";
-				});
-
-			weekRow.append("td")
-				.attr("class", "problem-bar")
-				.attr("value", function(d) { return +d.max_total_points; })
-				.attr("id", function(d) {
-					return d.lecture.replace(/\s+/g, '-') + "-prob-bar";
-				});
 
 			weekRow.each(function(d) {
 
@@ -542,6 +526,63 @@ $(function() {
 					return d.lecture.replace(/\s+/g, '-') + "-video-bar";
 				});
 		},
+		createLectureTable : function() {
+
+			var data = ctrl.getDetails();
+
+			var lectRow = d3.select(".lecture-progress-table")
+				.selectAll(".lecture-row")
+				.data(data)
+				.enter()
+				.append("div")
+				.attr("class", "lecture-row");
+
+			lectRow.append("div")
+				.attr("class", "lect-num")
+				.text(function(d) { return d.lecture; });
+
+			lectRow.append("div")
+				.attr("class", "data lect-data lect-problem-total")
+				.attr("value", function(d) { return +d.max_total_points; })
+				.attr("id", function(d) {
+					return "lect-problems-" + d.lecture.replace(/\s+/g, '-');
+				});
+
+			lectRow.append("div")
+				.attr("class", "lect-data lect-problems-percent")
+				.attr("value", function(d) { return +d.max_total_points; })
+				.attr("id", function(d) {
+					return "lect-problems-percent-" + d.lecture.replace(/\s+/g, '-');
+				});
+
+			lectRow.append("div")
+				.attr("class", "lect-problem-bar")
+				.attr("value", function(d) { return +d.max_total_points; })
+				.attr("id", function(d) {
+					return "lect-prob-bar-" + d.lecture.replace(/\s+/g, '-');
+				});
+
+			lectRow.append("div")
+				.attr("class", "data lect-data lect-video-total")
+				.attr("value", function(d) { return +d.max_total_time; })
+				.attr("id", function(d) {
+					return "lect-videos-" + d.lecture.replace(/\s+/g, '-');
+				});
+
+			lectRow.append("div")
+				.attr("class", "lect-data lect-videos-percent")
+				.attr("value", function(d) { return +d.max_total_time; })
+				.attr("id", function(d) {
+					return "lect-videos-percent-" + d.lecture.replace(/\s+/g, '-');
+				});
+
+			lectRow.append("div")
+				.attr("class", "lect-video-bar")
+				.attr("value", function(d) { return +d.max_total_time; })
+				.attr("id", function(d) {
+					return "lect-video-bar-" + d.lecture.replace(/\s+/g, '-');
+				});
+		},
 		createTimeOnSiteGraph : function(records, wid, hgt) {
 
 			var margin = {top: 20, right: 0, bottom: 70, left: 70},
@@ -558,7 +599,7 @@ $(function() {
 
 			var formatDate = d3.time.format("%x");
 
-			// create a tooltip
+			// create tooltips
 			var tip = d3.tip()
 				.attr('class', 'd3-tip')
 				.offset([-10, 0])
@@ -570,11 +611,19 @@ $(function() {
 				.attr('class', 'd3-tip')
 				.offset([-10, 0])
 				.html(function(d) {
-					return "<span>Students who earned a certificate spent at least " + ctrl.getMedian() + " minutes working through videos and problems each time they visited the site.</span>";
+					return "<span>Half of the students in this class spent " + ctrl.getMedian() + " minutes or more working through videos and problems each time they visited the site.</span>";
+				});
+
+			var cert_tip = d3.tip()
+				.attr('class', 'd3-tip')
+				.offset([-10, 0])
+				.html(function(d) {
+					return "<span>Students who earned a <span style='color: #DE7DAE'>certificate</span> in this class spent about " + ctrl.getAvgCertTime() + " minutes working through videos and problems each time they visited the site.</span>";
 				});
 
 			svg.call(tip);
 			svg.call(median_tip);
+			svg.call(cert_tip);
 
 			// set the scales for the x and y axis
 			var x = d3.time.scale()
@@ -586,8 +635,10 @@ $(function() {
 				return d.minutes_on_site;
 			});
 
+			var maxTime = Math.max(maxMins, ctrl.getMedian(), ctrl.getAvgCertTime());
+
 			var y = d3.scale.linear()
-					.domain([0, maxMins >= ctrl.getMedian() ? maxMins : ctrl.getMedian()])
+					.domain([0, maxTime])
 					.range([height, 0]);
 
 			// draw xAxis
@@ -669,70 +720,35 @@ $(function() {
 					return y(d.minutes_on_site);
 				});
 
+			// add median line of all the students' median minutes_on_site
 			var medianLineData = [	{ "x" : 0, "y" : ctrl.getMedian() },
 									{ "x" : width, "y" : ctrl.getMedian() }];
 
-			var createLine = d3.svg.line()
+			var createMedianLine = d3.svg.line()
 				.x(function(d) { return d.x;} )
 				.y(function(d) { return y(d.y);} )
 				.interpolate("linear");
 
 			svg.append("path")
 				.attr("class", "median")
-				.attr("d", createLine(medianLineData))
+				.attr("d", createMedianLine(medianLineData))
 				.on("mouseover", median_tip.show)
 				.on("mouseout", median_tip.hide);
-		},
-		createCourseMap : function() {
-			var mapNodes = copyArray(ctrl.getCourseMap()),
-				frag = document.createDocumentFragment(),
-				lectures = [],
-				lectNode,
-				row,
-				elem;
-			
-			for (var i=1, l=ctrl.getLectures().length; i<=l; i++) {
-				lectures.push("lec" + i);
-			}
 
-			for (i=0; i<l; i++) {
-				
-				row = document.createElement("div");
-				row.className = 'map-row';
-				row.setAttribute("data-lect", lectures.shift());
+			// add avg minutes_on_site for certificate earners
+			var certLineData = [	{ "x" : 0, "y" : ctrl.getAvgCertTime() },
+									{ "x" : width, "y" : ctrl.getAvgCertTime() }];
 
-				lectNode = document.createElement("div");
-				lectNode.className = "map-lect";
-				lectNode.innerHTML = "Lecture " + (i+1);
+			var createCertLine = d3.svg.line()
+				.x(function(d) { return d.x;} )
+				.y(function(d) { return y(d.y);} )
+				.interpolate("linear");
 
-				row.appendChild(lectNode);
-				
-				while (mapNodes.length > 0) {
-							
-					if (mapNodes[0].indexOf(row.getAttribute("data-lect")) > -1) {
-						elem = document.createElement("div");
-						elem.className = "map-node";
-						elem.setAttribute("data-id", mapNodes.shift());
-						row.appendChild(elem);
-					}
-					else {
-						break;
-					}
-				}
-				frag.appendChild(row);
-			}
-			document.getElementById("map").appendChild(frag);
-		},
-		colorCourseMap : function() {
-
-			d3.selectAll(".accessed-node")
-				.attr("class", "map-node");
-
-			var content = ctrl.getAccessedContent();
-			for (var i=0, l=content.length; i<l; i++) {
-				d3.select(".map-node[data-id=" + content[i] + "]")
-					.attr("class", "map-node accessed-node");
-			}
+			svg.append("path")
+				.attr("class", "cert")
+				.attr("d", createCertLine(certLineData))
+				.on("mouseover", cert_tip.show)
+				.on("mouseout", cert_tip.hide);
 		},
 		render : function() {
 			
@@ -785,9 +801,10 @@ $(function() {
 
 			d3.select("#video-time-class-percentile").text(ctrl.getVideoTimePercentile() + "%");
 
-			// bind progressByLecture data to the details table
+			// bind progressByLecture data to the lecture progress display
+
 			var lectureData, // student progress by lecture
-				elem, // HTML elem to bind the data
+				elem, // HTML placeholder elem to bind lecture data
 				lect, // lecture name for id of elem; will add suffix
 				o; // one lecture record for student in lectureData
 
@@ -795,38 +812,45 @@ $(function() {
 			for (var i=0, l=lectureData.length; i < l; i++) {
 				
 				o = lectureData[i];
-				lect = "#" + o.subsection;
+				lect = o.subsection;
 				
-				// bind problem data to table
-				elem = d3.select(lect + "-problems");
+				// bind lecture points
+				elem = d3.select("#lect-problems-" + lect);
 				elem.text( o.lecture_points + " / " + elem.attr("value") );
 
-				// draw bar for points total by lecture
-				drawBar(lect + "-prob-bar", 100, 20, o.lecture_points, +elem.attr("value"));
+				// bind lecture points percentage
+				elem = d3.select("#lect-problems-percent-" + lect);
+				elem.text(Math.floor(safeDivide(o.lecture_points, elem.attr("value")) * 100) + "%");
 
-				// bind video data to table
-				elem = d3.select(lect + "-videos");
-				elem.text( o.watched_seconds + " / " + elem.attr("value") );
+				// draw bar for lecture points
+				drawBar("#lect-prob-bar-" + lect, 100, 20, o.lecture_points, +elem.attr("value"));
 
-				// draw bar for video seconds watched by lecture
-				drawBar(lect + "-video-bar", 100, 20, o.watched_seconds, +elem.attr("value"));
+				// bind lecture video minutes
+				elem = d3.select("#lect-videos-" + lect);
+				elem.text(toMins(o.watched_seconds) + " / " + toMins(elem.attr("value")));
 
+				// bind lecture video time percentage
+				elem = d3.select("#lect-videos-percent-" + lect);
+				elem.text(Math.floor(safeDivide(o.watched_seconds, elem.attr("value")) * 100) + "%");
+
+				// draw bar lecture video minutes
+				drawBar("#lect-video-bar-" + lect, 100, 20, o.watched_seconds, +elem.attr("value"));
 			}
 
-			// bind data to individual problem scores
-			var details = ctrl.getDetailsProgress();
-			for ( var key in details ) {
-				if ( key.match(/^lec[0-9]+_p[0-9]+$/) !== null && key === key.match(/^lec[0-9]+_p[0-9]+$/)[0] ) {
-					elem = d3.select("#" + key);
-					elem.text(details[key] + "/" + elem.attr("value"));
-				}
-			}
-
-			// draw time on site chart
 			this.createTimeOnSiteGraph(ctrl.getVisits(), 1200, 300);
-
-			this.colorCourseMap();
 		}
 	};
 	ctrl.init();
 });
+
+
+			// bind data to individual problem scores
+			// var details = ctrl.getDetailsProgress();
+			// for ( var key in details ) {
+			// 	if ( key.match(/^lec[0-9]+_p[0-9]+$/) !== null && key === key.match(/^lec[0-9]+_p[0-9]+$/)[0] ) {
+			// 		elem = d3.select("#" + key);
+			// 		elem.text(details[key] + "/" + elem.attr("value"));
+			// 	}
+			// }
+
+			// draw time on site chart

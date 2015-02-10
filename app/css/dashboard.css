@@ -4,15 +4,9 @@ body, html {
 	width: 100%;
 	height: 100%;
 	font-family: "Open Sans", Verdana, Geneva, sans-serif;
-	background: white;
-	color: #333;
-}
-
-body {
-	font-family: "Open Sans", Verdana, Geneva, sans-serif;
 	font-size: 14px;
 	background: white;
-	color: #333;
+	color: #555;
 }
 
 div {
@@ -69,37 +63,44 @@ img[title="Home Page"] {
 *
 */
 .main-container {
-	margin: 0 2%;
-	width: 96%
+	margin: 0 1.5% 2% 1.5%;
+	width: auto;
 }
 
 h1 {
   font-size: 1em;
   color: #333;
-  margin-bottom: 1%;
+  margin: 1% 0;
   padding: 0;
+  display: inline-block;
 }
 
 .icon .long .arrow {
 	float: left;
 }
 
+.selection {
+	margin: 0;
+}
+
+.data {
+	color: black;
+}
+
 /*
 *
-* Progress and Summary Displays
+* Current and All Progress Displays
 *
 */
 
-.progress-container, .summary-container, .attendance-container {
-	padding: 1%;
+.progress-container,
+.summary-container,
+.attendance-container,
+.lecture-container {
 	border: 1px solid #ccc;
 	-webkit-border-radius: 20px;
 	-moz-border-radius: 20px;
 	border-radius: 20px;
-}
-
-.inner-rect:hover {
-	fill: #DE7DAE;
 }
 
 .all-progress {
@@ -113,14 +114,14 @@ h1 {
 	color: darkgray;
 	display: inline-block;
 	padding-left: 2%;
-	text-align: center;
+	text-align: left;
 }
 
 .stat-title, .stat-data, .stat-percentile, .stat-bar, .class-percentile {
 	display: inline-block;
 }
 
-.stat-title {
+.stat-title, .stat-data, .stat-percentile {
 	text-align: right;
 }
 
@@ -133,19 +134,140 @@ h1 {
 	float: right;
 }
 
+.progress-container, .summary-container {
+	margin: 1% 0;
+	width: 45%;
+	float: left;
+}
+
+.progress-row, .summary-row {
+	display: block;
+	margin: 1% 0;
+}
+
+.stat-title {
+	width: 35%;
+}
+
+.stat-data {
+	width: 15%;
+}
+
+.stat-percentile {
+	width: 10%;
+	padding-left: 1.5%;
+	color: #A7A7A7;
+}
+
+.stat-bar {
+	width: 20%;
+	vertical-align: middle;
+}
+
 .class-percentile {
+	width: 15%;
+	text-align: center;
 	color: #B72667;
 	opacity: .8;
 }
+
 	/*color: #B72667;  	dark pink */
 	/*color: #00A0E3; 	dark blue */
 	/*color : #DE7DAE; 	light pink */
 
 /*
 *
+* Lecture Progress Display
+*
+*/
+
+.head-lecture-row,
+.lecture-row {
+	width: 100%;
+	padding: 1% 2%;
+}
+
+.lecture-progress-table > div > div {
+	display: inline-block;
+}
+
+.lecture-progress-table tr th{
+	font-weight: normal;
+}
+
+.lecture-row:nth-child(2n) {
+	background: #F2F2F2;
+}
+
+.lecture-container {
+	margin: 1% 0;
+	margin-left: 2%;
+	width: 53%;
+	float: right;
+}
+.lects {
+	width: 13%;
+}
+
+.lect-problems {
+	width: 16.3%;
+	text-align: right;
+}
+
+.lect-videos {
+	width: 41.5%;
+	text-align: right;
+}
+
+.lect-num {
+	width: 15%;
+}
+
+.lect-problem-total {
+	width: 15%;
+}
+
+.lect-problems-percent {
+	width: 10%;
+	color: #A7A7A7;
+}
+
+.lect-problem-bar {
+	width: 17.5%;
+	vertical-align: middle;
+	padding-left: 1%;
+}
+
+.lect-video-total {
+	width: 15%;
+}
+
+.lect-videos-percent {
+	width: 10%;
+	color: #A7A7A7;
+}
+
+.lect-video-bar {
+	width: 15.5%;
+	vertical-align: middle;
+	padding-left: 1%;
+}
+
+.lect-data {
+	text-align: right;
+}
+
+/*
+*
 * Attendance Bar Graph
 *
 */
+
+.attendance-container {
+	width: 100%;
+	clear: both;
+	text-align: center;
+}
 
 path, line {
 	fill: none;
@@ -158,6 +280,14 @@ text {
 }
 
 .median {
+	stroke: #00A0E3;
+	stroke-width: 2;
+	fill: #00A0E3;
+	shape-rendering: crispEdges;
+	opacity: .5;
+}
+
+.cert {
 	stroke: #B72667;
 	stroke-width: 2;
 	fill: #B72667;
@@ -203,128 +333,9 @@ text {
 
 /*
 *
-* Course Map
+* Goals
 *
 */
-
-.course-map {
-	text-align: center;
-}
-
-.map-container {
-	margin: 2% 0;
-}
-
-.map-row {
-	margin: 1% 0;
-	display: block;
-}
-
-.map-lect {
-	display: inline-block;
-	width: 100px;
-	text-align: left;
-	font-size: 1.1em;
-	position: relative;
-	top: 50%;
-  	transform: translateY(-50%);
-}
-
-.map-node {
-	background-color: #F2F2F2;
-	height: 30px;
-	width: 30px;
-	display: inline-block;
-	border: 1px solid #333;
-	border: 1px solid rgba(0, 0, 0, .5);
-/*	-webkit-border-radius: 4px;
-	-moz-border-radius: 4px;
-	border-radius: 4px;*/
-}
-
-.accessed-node {
-	background-color: #71C3E8;
-}
-
-/*
-*
-* Progress Details Table
-*
-*/
-
-.details-container {
-	margin: 2% 0;
-	overflow-x: auto;
-}
-
-.week-row {
-	width: 100%;
-	font-size: 1.1em;
-	font-weight: normal;
-}
-
-.week-row:nth-child(2n+1) {
-	background: #F2F2F2;
-}
-
-.details-table tr th{
-	font-weight: normal;
-}
-
-.detail-week {
-	width: 10%;
-}
-
-.detail-lecture {
-	width: 10%;
-}
-
-.detail-score {
-	width: 10%;
-	text-align: center;
-}
-
-.detail-problem-bar {
-	width: 15%;
-}
-
-.detail-problems {
-	width: 30%;
-}
-
-.detail-video-time {
-	width: 10%;
-}
-
-.detail-video-bar {
-	width: 15%;
-}
-
-.problem-set {
-	display: inline-block;
-	padding-top: 1em;
-	padding-bottom: 1em;
-}
-
-.problem-id {
-	color: dimgray;
-	font-size: .9em;
-}
-
-.detail-problems, .detail-score, .detail-video-time {
-	color: #333;
-	font-size: 1.1em;
-}
-
-.problem-total, .video-total {
-	color: black;
-	font-size: 1.05em;
-}
-
-.percent {
-	display: inline;
-	padding-left: 10%;
-}
 
 .goals {
 	display: none;
@@ -350,6 +361,7 @@ input[type=number] {
 */
 
 .look {
-	font-size: 1.4em;
+	margin: 2% 0 0 2%;
+	font-size: 1.2em;
 	color: #646464;
 }

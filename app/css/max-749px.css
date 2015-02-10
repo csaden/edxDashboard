@@ -1,15 +1,12 @@
 @media only screen and (max-width:750px) {
 
-	.nav-bar {
-		display: none;
-		visibility: hidden;
-	}
-
-	.content {
-		vertical-align: central;
-		padding-top: 1%;
-		padding-right: 5%;
-		float: right;
+	.progress-container,
+	.summary-container,
+	.lecture-container,
+	.scatter-container,
+	.attendance-container {
+		width: 100%;
+		overflow-x: auto;
 	}
 	
 	/* have table scroll horizontally */

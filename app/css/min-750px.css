@@ -1,0 +1,41 @@
+@media only screen and (min-width:750px) and (max-width:1049px) {
+
+	.progress-container,
+	.summary-container,
+	.lecture-container {
+		display: block;
+		float: none;
+		width: 80%;
+		margin: 1% auto;
+	}
+
+	.main-display {
+		display: -webkit-flex;
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+	}
+
+	.progress-container {
+		-webkit-order: 1;
+		order: 1;
+	}
+
+	.summary-container {
+		-webkit-order: 2;
+		order: 2;
+	}
+
+	.lecture-container {
+		-webkit-order: 3;
+		order: 3;
+
+	}
+
+	.scatter-container,
+	.attendance-container {
+		width: 100%;
+		overflow-x: auto;
+	}
+
+}

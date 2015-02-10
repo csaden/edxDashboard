@@ -154,6 +154,10 @@ function drawBar(id, width, height, data, total) {
 		// .attr("ry", radius)
 }
 
+function toMins(sec) {
+	return +sec >= 0 ? Math.round(sec/60) : 0;
+}
+
 function formatTime(num) {
 
     var sec_num = parseInt(+num, 10);
@@ -168,4 +172,4 @@ function formatTime(num) {
     var time    = hours+':'+minutes+':'+seconds;
 
     return time;
-};
+}

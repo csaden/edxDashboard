@@ -7,8 +7,9 @@
 	<link href="bower_components/semantic-ui/dist/semantic.min.css" rel="stylesheet" type="text/css" ></link>
 <!-- https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/1.8.1/semantic.min.css -->
 	<link href="css/dashboard.css" rel="stylesheet"></link>
-	<link href="css/max-750px.css" media="(max-width:750px)" rel="stylesheet"></link>
-	<link href="css/min-751px.css" media="(max-width:1249px)" rel="stylesheet"></link>
+	<link href="css/max-749px.css" media="(max-width:749px)" rel="stylesheet">
+	<link href="css/min-750px.css" media="(min-width:750px)" rel="stylesheet"></link>
+	<link href="css/min-1050px.css" media="(max-width:1249px)" rel="stylesheet"></link>
 	<link href="css/min-1250px.css" media="(min-width:1250px)" rel="stylesheet"></link>
 	<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro' rel='stylesheet'>
 <!-- 	<link rel="stylesheet" type="text/css" href="css/media_query_reporter.css"> -->
@@ -28,28 +29,9 @@
 <body>
 	<script type="text/javascript" src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
 
-	<nav class="nav-bar">
-		<a class="edx-home-image">
-			<img href="https://edx.org" title="Home Page" src="img/edx-logo-77x36.png">
-		</a>
-		<a class="item">Courseware</a>
-		<a class="item">Updates & News</a>
-		<a class="item">Calendar</a>
-		<a class="item">Wiki</a>
-		<a class="item">Discussion</a>
-		<a class="item active">Progress</a>
-	</nav>
-	
-	<nav class="nav-mobile">
-		<a class="edx-home-image">
-			<img href="https://edx.org" title="Home Page" src="img/edx-logo-77x36.png">
-		</a>
-		<a "menu-mobile"><i class="large content icon"></i></a>
-	</nav>
-
 	<div class="main-container">
 
-		<div class="course-name"><h1>MITx: 6.00.1x Introduction to Computer Science and Programming Using Python</h1></div>
+		<h1>MITx: 6.00.1x Introduction to Computer Science and Programming Using Python</h1>
 
 		<div id="student-dropdown" class="student-dropdown">
 			<i class="icon large long arrow right pink"></i>
@@ -61,38 +43,51 @@
 			</div>
 		</div>
 
-		<div class="goals-form">
+<!-- 		<div class="goals-form">
 			<form id="goals" class="goals">
 				<div class="goal">
 					<label for="certificate">Would you like to try to earn a certificate in this course?</label>
 					<input name="certificate" type="checkbox">
 				</div>
 			</form>
-		</div>
+		</div> -->
+
+	<div class="main-display">
 
 		<div class="progress-container">
 			<div class="look">Your Current Progress</div>
 			<div class="progress-row">
 				<div class="stat-title">Average Daily Visit</div>
-				<div id="daily-time" class="stat-data"></div>
+				<div id="daily-time" class="data stat-data"></div>
 			</div>
 			<div class="progress-row">
 				<div class="stat-title">Points Attempted</div>
-				<div id="progress-points" class="stat-data"></div>
+				<div id="progress-points" class="data stat-data"></div>
 				<div id="progress-points-percent" class="stat-percentile"></div>
 				<div id="progress-points-bar" class="stat-bar"></div>
 			</div>
 			<div class="progress-row">
 				<div class="stat-title">Video Time Watched</div>
-				<div id="progress-video-time" class="stat-data time"></div>
+				<div id="progress-video-time" class="data stat-data time"></div>
 				<div id="progress-video-time-percent" class="stat-percentile"></div>
 				<div id="progress-video-time-bar" class="stat-bar"></div>
 			</div>
 			<div class="progress-row">
 				<div class="stat-title">Time of Accessed Videos</div>
-				<div id="progress-attempted-time" class="stat-data time"></div>
+				<div id="progress-attempted-time" class="data stat-data time"></div>
 			</div>
 
+		</div>
+
+		<div class="lecture-container">
+			<div class="lecture look">Progress by Lecture</div>
+			<div class="lecture-progress-table">
+				<div class="head-lecture-row">
+					<div class="lects"></div>
+					<div class="lect-problems">Points Earned</div>
+					<div class="lect-videos">Minutes Watched</div>
+				</div>
+			</div>
 		</div>
 
 		<div class="summary-container">
@@ -100,56 +95,36 @@
 			<div class="week-note">8 of 8 Weeks Released</div>
 			<div class="summary-row">
 				<div class="stat-title">Current Grade</div>
-				<div id="current-grade" class="stat-data"></div>
+				<div id="current-grade" class="data stat-data"></div>
 				<div class="stat-percentile"></div>
 				<div class="stat-bar"></div>
 				<div class="class-percentile">Percentile</div>
 			</div>
 			<div class="summary-row">
 				<div class="stat-title">All Points</div>
-				<div id="total-points" class="stat-data time"></div>
+				<div id="total-points" class="data stat-data time"></div>
 				<div id="total-points-percentile" class="stat-percentile"></div>
 				<div id="total-points-bar" class="stat-bar"></div>
 				<div id="points-class-percentile" class="class-percentile"></div>
 			</div>
 			<div class="summary-row">
 				<div class="stat-title">Video Time Watched</div>
-				<div id="total-video-time" class="stat-data time"></div>
+				<div id="total-video-time" class="data stat-data time"></div>
 				<div id="total-video-time-percentile" class="stat-percentile"></div>
 				<div id="total-video-time-bar" class="stat-bar"></div>
 				<div id="video-time-class-percentile" class="class-percentile"></div>
 			</div>
 			<div class="progress-row">
 				<div class="stat-title">Time of All Videos</div>
-				<div id="total-possible-time" class="stat-data time"></div>
+				<div id="total-possible-time" class="data stat-data time"></div>
 			</div>
 		</div>
+
+	</div>
 
 		<div class="attendance-container">
 			<div class="attendance look">Daily Time on Site</div>
 			<div id="attendance-chart"></div>
-		</div>
-
-		<div class="details-container">
-			<table class="details-table" class="look">
-				<thead>
-					<tr>
-						<th class="detail-week look">Progress Details</th>
-						<th class="detail-lecture"></th>
-						<th class="detail-score">Total Score</th>
-						<th class="detail-problem-bar"></th>
-						<th class="detail-problems">Problem Scores</th>
-						<th class="detail-video-time">Total Video Seconds Watched</th>
-						<th class="detail-video-bar"></th>
-					</tr>
-				</thead>
-				<tbody></tbody>
-			</table>
-		</div>
-
-		<div class="map-container">
-			<div class="look course-map">Course Map</div>
-			<div id="map" class="map"></div>
 		</div>
 
 	</div>
