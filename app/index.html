@@ -9,6 +9,8 @@
 	<link href="css/dashboard.css" rel="stylesheet"></link>
 	<link href="css/max-749px.css" media="(max-width:749px)" rel="stylesheet">
 	<link href="css/min-750px.css" media="(min-width:750px)" rel="stylesheet"></link>
+	<link href="css/max-874px.css" media="(max-width:874px)" rel="stylesheet"></link>
+	<link href="css/min-875px.css" media="(min-width:875px)" rel="stylesheet"></link>
 	<link href="css/min-1050px.css" media="(max-width:1249px)" rel="stylesheet"></link>
 	<link href="css/min-1250px.css" media="(min-width:1250px)" rel="stylesheet"></link>
 	<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro' rel='stylesheet'>
@@ -31,15 +33,33 @@
 
 	<div class="main-container">
 
-		<h1>MITx: 6.00.1x Introduction to Computer Science and Programming Using Python</h1>
+		<h1 class="class-title">MITx: 6.00.1x Introduction to Computer Science and Programming Using Python</h1>
+
+		<div class="recent-container-large">
+			<div class="recent-row">
+				<div class="recent-name">Last Problem Attempted:</div><div class="last-node last-problem"></div>
+			</div>
+			<div class="recent-row">
+				<div class="recent-name">Last Video Watched:</div><div class="last-node last-video"></div>
+			</div>
+		</div>
 
 		<div id="student-dropdown" class="student-dropdown">
 			<i class="icon large long arrow right pink"></i>
 			<div class="ui search selection dropdown">
 				<input type="hidden" name="currentStudent"></input>
 				<i class="dropdown icon"></i>
-				<div class="select-student default text">Enter a student id number or select a student...</div>
+				<div class="select-student default text">Enter a student id number or select a student</div>
 				<div id="students" class="menu"></div>
+			</div>
+		</div>
+
+		<div class="recent-container-small">
+			<div class="recent-row">
+				<div class="recent-name">Last Problem Attempted:</div><div class="last-node last-problem"></div>
+			</div>
+			<div class="recent-row">
+				<div class="recent-name">Last Video Watched:</div><div class="last-node  last-video"></div>
 			</div>
 		</div>
 
@@ -54,44 +74,8 @@
 
 	<div class="main-display">
 
-		<div class="progress-container">
-			<div class="look">Your Current Progress</div>
-			<div class="progress-row">
-				<div class="stat-title">Average Daily Visit</div>
-				<div id="daily-time" class="data stat-data"></div>
-			</div>
-			<div class="progress-row">
-				<div class="stat-title">Points Attempted</div>
-				<div id="progress-points" class="data stat-data"></div>
-				<div id="progress-points-percent" class="stat-percentile"></div>
-				<div id="progress-points-bar" class="stat-bar"></div>
-			</div>
-			<div class="progress-row">
-				<div class="stat-title">Video Time Watched</div>
-				<div id="progress-video-time" class="data stat-data time"></div>
-				<div id="progress-video-time-percent" class="stat-percentile"></div>
-				<div id="progress-video-time-bar" class="stat-bar"></div>
-			</div>
-			<div class="progress-row">
-				<div class="stat-title">Time of Accessed Videos</div>
-				<div id="progress-attempted-time" class="data stat-data time"></div>
-			</div>
-
-		</div>
-
-		<div class="lecture-container">
-			<div class="lecture look">Progress by Lecture</div>
-			<div class="lecture-progress-table">
-				<div class="head-lecture-row">
-					<div class="lects"></div>
-					<div class="lect-problems">Points Earned</div>
-					<div class="lect-videos">Minutes Watched</div>
-				</div>
-			</div>
-		</div>
-
 		<div class="summary-container">
-			<div class="look all-progress">All Course Progress</div>
+			<div class="section all-progress">All Course Progress<i class=" help circle icon"></i></div>
 			<div class="week-note">8 of 8 Weeks Released</div>
 			<div class="summary-row">
 				<div class="stat-title">Current Grade</div>
@@ -120,10 +104,52 @@
 			</div>
 		</div>
 
+		<div class="lecture-container">
+			<div class="section">Progress by Lecture</div>
+			<div class="lecture-progress-table">
+				<div class="head-lecture-row">
+					<div class="lects"></div>
+					<div class="lect-problems">Points Earned</div>
+					<div class="lect-videos">Video Watched (mins)</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="progress-container">
+			<div class="section">Your Current Progress<i class="help circle icon"></i></div>
+			<div class="progress-row">
+				<div class="stat-title">Average Daily Visit</div>
+				<div id="daily-time" class="data stat-data"></div>
+			</div>
+			<div class="progress-row">
+				<div class="stat-title">Points Attempted</div>
+				<div id="progress-points" class="data stat-data"></div>
+				<div id="progress-points-percent" class="stat-percentile"></div>
+				<div id="progress-points-bar" class="stat-bar"></div>
+			</div>
+			<div class="progress-row">
+				<div class="stat-title">Video Time Watched</div>
+				<div id="progress-video-time" class="data stat-data time"></div>
+				<div id="progress-video-time-percent" class="stat-percentile"></div>
+				<div id="progress-video-time-bar" class="stat-bar"></div>
+			</div>
+			<div class="progress-row">
+				<div class="stat-title">Time of Accessed Videos</div>
+				<div id="progress-attempted-time" class="data stat-data time"></div>
+			</div>
+
+		</div>
+
+		<div class="scatter-container">
+			<div class="scatter-title section">Progress for All Students</div>
+			<button class="me-button">Where am I?</button>
+			<div id="scatter-chart"></div>
+		</div>
+
 	</div>
 
 		<div class="attendance-container">
-			<div class="attendance look">Daily Time on Site</div>
+			<div class="attendance section">Daily Time on Site</div>
 			<div id="attendance-chart"></div>
 		</div>
 

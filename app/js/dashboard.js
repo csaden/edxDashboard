@@ -17,10 +17,11 @@ $(function() {
 			modelThis.pointsPercentile = null;
 			modelThis.videoTimePercentile = null;
 			modelThis.detailsProgress= null;
+			modelThis.lastVideoWatched = null;
+			modelThis.lastProblemAttempted = null;
+			
+			// not currently used
 			modelThis.accessedContent = null;
-
-			// add this information ???
-			modelThis.lastNode = null;
 
 			// original csv data
 			modelThis.minutesPerDay = null;
@@ -284,6 +285,12 @@ $(function() {
 				return +element.student_id === +studentId;
 			}, studentId);
 
+			try {
+				modelThis.lastProblemAttempted = "<a href='#' target='_blank'>" +  problems[problems.length - 1].problem_id + "</a>";
+			} catch(err) {
+				modelThis.lastProblemAttempted = "N/A";
+			}
+
 			if (problems.length > 0) {
 
 				modelThis.progressPoints = d3.sum(problems, function(d) {
@@ -302,6 +309,11 @@ $(function() {
 				return +record.student_id === +studentId;
 			}, studentId);
 
+			try {
+				modelThis.lastVideoWatched = "<a href='#' target='_blank'>" + videos[videos.length - 1].video_id + "</a>"
+			} catch(err) {
+				modelThis.lastVideoWatched = "N/A";
+			}
 			if (videos.length > 0) {
 				modelThis.progressVideoTime = d3.sum(videos, function(d) { return +d.watched_seconds;
 				});
@@ -365,6 +377,12 @@ $(function() {
 		getVisits : function(studentId) {
 			return modelThis.visits;
 		},
+		getLastProblemAttempted : function() {
+			return modelThis.lastProblemAttempted;
+		},
+		getLastVideoWatched : function () {
+			return modelThis.lastVideoWatched;
+		},
 		getProgressPoints : function() {
 			return modelThis.progressPoints;
 		},
@@ -377,7 +395,7 @@ $(function() {
 		getAttemptedVideoTime : function () {
 			return modelThis.attemptedVideoTime;
 		},
-		getPossiblePoints: function() {
+		getPossiblePoints : function() {
 			return modelThis.possiblePoints;
 		},
 		getPossibleVideoTime : function() {
@@ -385,6 +403,9 @@ $(function() {
 		},
 		getProgressByLecture : function() {
 			return modelThis.progressByLecture;
+		},
+		getAllProgress : function() {
+			return modelThis.allProgress;
 		},
 		getMinutesPerDay : function() {
 			return modelThis.minutesPerDay;
@@ -471,6 +492,8 @@ $(function() {
 			$('input').on('change', function(){
 				$('.long.arrow.right.pink').hide();
 			});
+
+			this.createAllProgressGraph(600, 290);
 		},
 		createDropDown : function() {
 
@@ -537,7 +560,14 @@ $(function() {
 				.append("div")
 				.attr("class", "lecture-row");
 
-			lectRow.append("div")
+			var lect = lectRow.append("div")
+				.attr("class", "lecture")
+			
+			lect.append("input")
+				.attr("type", "checkbox")
+				.attr("name", function(d) {return d.lecture; })
+			
+			lect.append("div")
 				.attr("class", "lect-num")
 				.text(function(d) { return d.lecture; });
 
@@ -583,9 +613,103 @@ $(function() {
 					return "lect-video-bar-" + d.lecture.replace(/\s+/g, '-');
 				});
 		},
+		createAllProgressGraph : function(wid, hgt) {
+			var margin = {top: 40, right: 15, bottom: 50, left: 80},
+				width = wid - margin.left - margin.right,
+				height = hgt - margin.top - margin.bottom;
+
+			var student_tip = d3.tip()
+				.attr('class', 'd3-tip')
+				.offset([-10, 0])
+				.html(function(d) {
+					return "<span>Grade:</span> <span style='color:#DE7DAE'>" + d.total_score + "%</span> <br> <span>Videos Watched:</span> <span style='color:#DE7DAE'>" + Math.round(d.total_seconds / ctrl.getPossibleVideoTime() * 100) + "%" + "</span> <br> <span>Total Video Time:</span> <span style='color:#DE7DAE'>" + Math.round(
+						d.total_seconds / 60) + " mins" + "</span>";
+				});
+
+			var data = ctrl.getAllProgress();
+
+			// set the scales for the x and y axis
+			var x = d3.scale.linear()
+					.domain([0, 100])
+					.range([0, width]);
+
+			var xAxis = d3.svg.axis()
+				.scale(x)
+				.orient("bottom");
+
+			var y = d3.scale.linear()
+				.domain([0, 100])
+				.range([height, 0]);
+
+			var yAxis = d3.svg.axis()
+				.scale(y)
+				.orient("left");
+
+			var svg = d3.select("#scatter-chart")
+				.append("svg")
+				.attr("class", "all-student-progress-graph")
+				.attr("width", width + margin.left + margin.right)
+				.attr("height", height + margin.top + margin.bottom)
+				// .call(d3.behavior.zoom().on("zoom", function() {
+				// 	svg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")");
+				// }))
+				.append("g")
+				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+			svg.call(student_tip);
+
+			// draw xAxis
+			xAxisG = svg.append("g")
+				.attr("class", "x axis")
+				.attr("transform", "translate(0," + height + ")")
+				.call(xAxis);
+
+			xAxisG.append("text")
+				.attr("x", width / 2)
+				.attr("y", margin.bottom - 15)
+				.attr("text-anchor", "middle")
+				.text("Videos Watched (%)");
+
+			// draw yAxix
+			yAxisG = svg.append("g")
+				.attr("class", "y axis")
+				.call(yAxis);
+
+			yAxisG.append("text")
+				.attr("x", 0)
+				.attr("y", -15)
+				.attr("text-anchor", "end")
+				.text("Grade (%)");
+
+			svg.selectAll("circle")
+				.data(data)
+				.enter()
+				.append("svg:circle")
+				.attr("class", ".points")
+				.attr("id", function(d) {
+					return "point-" + d.student_id;
+				})
+				.attr("r", 4)
+				.attr("opacity", 0.2)
+				.attr("cy", function(d) {
+					return y(d.total_score / ctrl.getPossiblePoints() * 100);
+				})
+				.attr("cx", function(d) {
+					return x(d.total_seconds / ctrl.getPossibleVideoTime() * 100);
+				})
+				.on("mouseover", student_tip.show)
+				.on("mouseout", student_tip.hide);
+
+			d3.select(".me-button").on("click", showMe);
+
+			function showMe() {
+				console.log("#point-" + ctrl.getCurrentStudent());
+				view.growCircle("#point-" + ctrl.getCurrentStudent());
+			}
+		},
 		createTimeOnSiteGraph : function(records, wid, hgt) {
 
-			var margin = {top: 20, right: 0, bottom: 70, left: 70},
+			var margin = {top: 25, right: 0, bottom: 70, left: 60},
 				width = wid - margin.left - margin.right,
 				height = hgt - margin.top - margin.bottom;
 
@@ -611,14 +735,14 @@ $(function() {
 				.attr('class', 'd3-tip')
 				.offset([-10, 0])
 				.html(function(d) {
-					return "<span>Half of the students in this class spent " + ctrl.getMedian() + " minutes or more working through videos and problems each time they visited the site.</span>";
+					return "<span>Most students spent at least </span> <span style='color:#BEBEBE'>" + ctrl.getMedian() + " minutes</span> <span> on the site each time they visited.</span>";
 				});
 
 			var cert_tip = d3.tip()
 				.attr('class', 'd3-tip')
 				.offset([-10, 0])
 				.html(function(d) {
-					return "<span>Students who earned a <span style='color: #DE7DAE'>certificate</span> in this class spent about " + ctrl.getAvgCertTime() + " minutes working through videos and problems each time they visited the site.</span>";
+					return "<span>Students who earned a <span style='color: #DE7DAE'>certificate</span> in this class spent about <span style='color:#DE7DAE'> " + ctrl.getAvgCertTime() + " minutes</span> <span> on the site each time they visited.</span>";
 				});
 
 			svg.call(tip);
@@ -648,7 +772,7 @@ $(function() {
 				.tickFormat(d3.time.format("%x"));
 
 			var xAxisG = svg.append("g")
-				.attr("class", "x-axis")
+				.attr("class", "x axis")
 				.attr("transform", "translate(0," + height + ")");
 
 			xAxisG.transition()
@@ -667,7 +791,7 @@ $(function() {
 				.orient("left");
 
 			var yAxisG = svg.append("g")
-				.attr("class", "y-axis")
+				.attr("class", "y axis")
 				.attr("transform", "translate(-10, 0)");
 
 			yAxisG.transition()
@@ -675,9 +799,8 @@ $(function() {
 				.call(yAxis);
 
 			yAxisG.append("text")
-				.attr("transform", "rotate(-90)")
-				.attr("x", -90)
-				.attr("y", -50)
+				.attr("x", 0)
+				.attr("y", -20)
 				.attr("dy", ".7em")
 				.attr("text-anchor", "end")
 				.text("Minutes");
@@ -750,6 +873,23 @@ $(function() {
 				.on("mouseover", cert_tip.show)
 				.on("mouseout", cert_tip.hide);
 		},
+		colorCurrentStudent : function() {
+			d3.select(".youAreHere")
+				.attr("class", "points")
+				.attr("r", 4);
+
+			this.growCircle("#point-" + ctrl.getCurrentStudent());
+		},
+		growCircle : function(elem_id) {
+			d3.select(elem_id)
+				.attr("class", "points youAreHere")
+				.transition()
+				.duration(1000)
+				.attr("r", 25)
+				.transition()
+				.duration(500)
+				.attr("r", 7);
+		},
 		render : function() {
 			
 			// remove current data .inner-rect from the page
@@ -759,8 +899,16 @@ $(function() {
 				.attr("width", 0)
 				.remove();
 
+			// remove time on site graph for current student
 			d3.select(".time-on-site-graph")
 				.remove();
+			
+			// set most recent work
+			d3.selectAll(".last-problem").html(ctrl.getLastProblemAttempted());
+			d3.selectAll(".last-video").html(ctrl.getLastVideoWatched());
+
+			// color current student point in scatterplot
+			this.colorCurrentStudent();
 
 			// draw four main bars for work in progress and total progress
 			drawBar("#progress-points-bar", 100, 20, ctrl.getProgressPoints(), ctrl.getAttemptedPoints());
@@ -842,7 +990,6 @@ $(function() {
 	};
 	ctrl.init();
 });
-
 
 			// bind data to individual problem scores
 			// var details = ctrl.getDetailsProgress();

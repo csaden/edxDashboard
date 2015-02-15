@@ -1,8 +1,8 @@
 @media only screen and (min-width:1250px) {
 
-	.dropdown {
-		width: 35%;
-		display: inline-block;
+	.recent-container-small {
+		display: none;
+		visibility: hidden;
 	}
 
 }

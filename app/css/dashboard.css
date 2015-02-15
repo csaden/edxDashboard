@@ -1,3 +1,7 @@
+/*color: #B72667;  	dark pink */
+/*color: #00A0E3; 	dark blue */
+/*color : #DE7DAE; 	light pink */
+
 body, html {
 	margin: 0;
 	padding: 0;
@@ -21,7 +25,6 @@ ul {
 }
 
 a {
-  padding: 1.2em;
   color: inherit;
 }
 
@@ -68,11 +71,38 @@ img[title="Home Page"] {
 }
 
 h1 {
-  font-size: 1em;
-  color: #333;
-  margin: 1% 0;
-  padding: 0;
-  display: inline-block;
+	font-size: 1em;
+	color: #333;
+	margin: 1% 0;
+	padding: 0;
+	display: inline-block;
+}
+
+.recent-container-large {
+	margin: 1% 0;
+	display: inline-block;
+	float: right;
+	width: 30%;
+}
+
+.recent-row {
+	width: 100%;
+	margin: 1% 0;
+	display: block;
+}
+
+.recent-name {
+	width: 70%;
+	display: inline-block;
+	text-align: right;
+	padding-left: 5%;
+	padding-right: 2%;
+}
+
+.last-node {
+	width: 30%;
+	display: inline-block;
+	padding-right: 5%;
 }
 
 .icon .long .arrow {
@@ -93,8 +123,11 @@ h1 {
 *
 */
 
+.recent-container-large,
+.recent-container-small,
 .progress-container,
 .summary-container,
+.scatter-container,
 .attendance-container,
 .lecture-container {
 	border: 1px solid #ccc;
@@ -135,7 +168,8 @@ h1 {
 }
 
 .progress-container, .summary-container {
-	margin: 1% 0;
+	margin-top: 1%;
+	margin-bottom: 1%;
 	width: 45%;
 	float: left;
 }
@@ -171,9 +205,32 @@ h1 {
 	opacity: .8;
 }
 
-	/*color: #B72667;  	dark pink */
-	/*color: #00A0E3; 	dark blue */
-	/*color : #DE7DAE; 	light pink */
+/*
+*
+* All Student Progress Graph
+*
+*/
+.scatter-container {
+	margin: 1% 0;
+	width: 45%;
+	float: left;
+}
+.scatter-title {
+	display: inline-block;
+}
+
+.me-button {
+  right: 30px;
+  top: 30px;
+  margin: 2% 2% 0 0;
+  float: right;
+}
+
+.youAreHere {
+	color: #B72667;
+	fill: #B72667;
+	opacity: .8;
+}
 
 /*
 *
@@ -219,12 +276,17 @@ h1 {
 	text-align: right;
 }
 
+.lecture {
+	width: 20%;
+}
+
 .lect-num {
-	width: 15%;
+	display: inline;
+	padding-left: 10%;
 }
 
 .lect-problem-total {
-	width: 15%;
+	width: 10%;
 }
 
 .lect-problems-percent {
@@ -269,28 +331,27 @@ h1 {
 	text-align: center;
 }
 
-path, line {
-	fill: none;
-	stroke: #000;
-	shape-rendering: crispEdges;
+svg {
+	font: .9em sans-serif;
 }
 
-text {
-	font-size: .9em;
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
 }
 
 .median {
-	stroke: #00A0E3;
-	stroke-width: 2;
-	fill: #00A0E3;
+	stroke: #BEBEBE;
+	stroke-width: 3;
 	shape-rendering: crispEdges;
 	opacity: .5;
 }
 
 .cert {
 	stroke: #B72667;
-	stroke-width: 2;
-	fill: #B72667;
+	stroke-width: 3;
 	shape-rendering: crispEdges;
 	opacity: .5;
 }
@@ -360,7 +421,7 @@ input[type=number] {
 *
 */
 
-.look {
+.section {
 	margin: 2% 0 0 2%;
 	font-size: 1.2em;
 	color: #646464;

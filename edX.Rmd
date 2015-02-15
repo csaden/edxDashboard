@@ -90,6 +90,9 @@ avgMinutesPerDay <- minutesPerDay %>%
     summarise(avg_minutes = mean(minutes_on_site),
               n=n())
 
+qplot(data=avgMinutesPerDay, x=date, y=avg_minutes) +
+    geom_line(color=I("steelblue"))
+
 # doesn't work as well because moving line is harder to interpret...threshold is easier with horizontal line, could probably do it on d3...R is picky
 minutesPerDay %>%
     filter(student_id==18) %>%
@@ -180,7 +183,7 @@ allProgress[is.na(allProgress)] <- 0
 
 ```{r}
 # Plot of video time watched vs points earned
-qplot(total_score, total_seconds, data=allProgress)
+qplot(total_score, total_seconds/60, data=allProgress)
 
 # TRY K-MEANS CLUSTERING!
 
@@ -220,5 +223,14 @@ ggplot(data=progressScaled,
 ```{r}
 setwd("~/edxDashboard/app/data/")
 write.csv(allProgress, "all_progress.csv", row.names=F)
+```
+
+
+```{r}
+# Get average time for certificate earners
+# Assuming certificate earners have a score of at least 55%
+res <- allProgress %>%
+    filter(total_score >= 55) %>%
+with(res, sum(total_minutes_on_site) / sum(n) )
 ```
 

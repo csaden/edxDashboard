@@ -1,13 +1,4 @@
-@media only screen and (min-width:1050px) and (max-width:1249px) {
-
-	h1 {
-		display: block;
-	}
-
-	.dropdown {
-		width: 35%;
-		display: inline-block;
-	}
+@media only screen and (min-width:1050px) and (max-width: 1249px) {
 
 	.main-display {
 		display: -webkit-flex;
@@ -16,28 +7,38 @@
 		flex-wrap: wrap;
 	}
 
-	.progress-container {
-		-webkit-order: 1;
-		order: 1;
-		width: 49%;
-		margin: 1% auto;
-		margin-right: 1%;
+	.recent-container-small {
+		display: none;
+		visibility: hidden;
 	}
 
-	.summary-container {
+	.progress-container {
 		-webkit-order: 2;
 		order: 2;
 		width: 49%;
 		margin: 1% auto;
-		margin-left: 1%;
+	}
+
+	.summary-container {
+		-webkit-order: 1;
+		order: 1;
+		width: 49%;
+		margin: 1% auto;
 	}
 
 	.lecture-container {
-		-webkit-order: 3;
-		order: 3;
-		width: 60%;
+		-webkit-order: 4;
+		order: 4;
+		width: 80%;
 		margin: 1% auto;
 
+	}
+
+	.scatter-container {
+		-webkit-order: 3;
+		order: 3;
+		width: 80%;
+		margin: 1% auto;
 	}
 
 	.lect-problems {

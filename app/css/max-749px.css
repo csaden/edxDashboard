@@ -1,4 +1,9 @@
 @media only screen and (max-width:750px) {
+	
+	.recent-container-small {
+		max-width: 386px;
+		margin: 2% auto 1%;
+	}
 
 	.progress-container,
 	.summary-container,
@@ -6,6 +11,7 @@
 	.scatter-container,
 	.attendance-container {
 		width: 100%;
+		margin: 1% auto;
 		overflow-x: auto;
 	}
 	
