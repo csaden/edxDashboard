@@ -493,7 +493,7 @@ $(function() {
 				$('.long.arrow.right.pink').hide();
 			});
 
-			this.createAllProgressGraph(600, 290);
+			this.createAllProgressGraph();
 		},
 		createDropDown : function() {
 
@@ -613,10 +613,12 @@ $(function() {
 					return "lect-video-bar-" + d.lecture.replace(/\s+/g, '-');
 				});
 		},
-		createAllProgressGraph : function(wid, hgt) {
+		createAllProgressGraph : function() {
 			var margin = {top: 40, right: 15, bottom: 50, left: 80},
-				width = wid - margin.left - margin.right,
-				height = hgt - margin.top - margin.bottom;
+				width = parseInt(d3.select("#scatter-chart").style("width"), 10)
+				width = width - margin.left - margin.right,
+				height = parseInt(d3.select("#scatter-chart").style("height"), 10),
+				height = height - margin.top - margin.bottom;
 
 			var student_tip = d3.tip()
 				.attr('class', 'd3-tip')
@@ -633,13 +635,43 @@ $(function() {
 					.domain([0, 100])
 					.range([0, width]);
 
-			var xAxis = d3.svg.axis()
-				.scale(x)
-				.orient("bottom");
-
 			var y = d3.scale.linear()
 				.domain([0, 100])
 				.range([height, 0]);
+
+			// responsive chart source: http://eyeseast.github.io/visible-data/2013/08/28/responsive-charts-with-d3/
+
+			d3.select(window).on("resize", resize);
+
+			function resize() {
+				// update the width and the height
+				width = parseInt(d3.select("scatter-chart").style("width"), 10);
+				height = parseInt(d3.select("scatter-chart").style("height"), 10);
+
+				x.range([0, width]);
+				y.range([0, height]);
+
+				// resize the chart
+				d3.select(svg.node().parentNode)
+					.style("width", (width + margin.left + margin.right) + "px")
+					.style("height", (height + margin.top + margin.bottom) + "px");
+
+				svg.selectAll("circle")
+					.attr("cx", function(d) {
+						return x(d.total_seconds / ctrl.getPossibleVideoTime() * 100);
+					})
+					.attr("cy", function(d) {
+						return y(d.total_score / ctrl.getPossiblePoints() * 100);
+					})
+
+				// update axes
+				svg.select("x axis").call(xAxis)
+				svg.select("y axis").call(yAxis)
+			}
+
+			var xAxis = d3.svg.axis()
+				.scale(x)
+				.orient("bottom");
 
 			var yAxis = d3.svg.axis()
 				.scale(y)
